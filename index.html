@@ -277,305 +277,295 @@
     <div id="mobileCards" class="mobile-cards"></div>
   </div>
 
-  <script>
-    const DATA_URL = 'https://script.google.com/macros/s/AKfycbzNyRqrftCnDaxXuMk_lV5kOdyqucar5yDn_eJT7gwgsQL9ltqMjRy6exyD5L4grwru7Q/exec';
-    const GOOGLE_MAPS_API_KEY = 'AIzaSyAO0OrBnbW_lnszGr6N8rojaJ1CWuaWd8M';
+<script>
+  const DATA_URL = 'https://script.google.com/macros/s/AKfycbzNyRqrftCnDaxXuMk_lV5kOdyqucar5yDn_eJT7gwgsQL9ltqMjRy6exyD5L4grwru7Q/exec';
+  const GOOGLE_MAPS_API_KEY = 'AIzaSyAO0OrBnbW_lnszGr6N8rojaJ1CWuaWd8M';
 
-    let map;
-    let infoWindow;
-    let allWalks = [];
-    let filteredWalks = [];
-    let markers = [];
-    let activeRowId = null;
+  let map;
+  let infoWindow;
+  let allWalks = [];
+  let filteredWalks = [];
+  let markers = [];
+  let activeRowId = null;
 
-    const statusEl = document.getElementById('status');
-    const resultCountEl = document.getElementById('resultCount');
-    const tableBody = document.getElementById('walkTableBody');
-    const emptyTable = document.getElementById('emptyTable');
-    const mobileCards = document.getElementById('mobileCards');
+  const statusEl = document.getElementById('status');
+  const resultCountEl = document.getElementById('resultCount');
+  const tableBody = document.getElementById('walkTableBody');
+  const emptyTable = document.getElementById('emptyTable');
+  const mobileCards = document.getElementById('mobileCards');
 
-    const searchInput = document.getElementById('searchInput');
-    const dateFilter = document.getElementById('dateFilter');
-    const neighbourhoodFilter = document.getElementById('neighbourhoodFilter');
-    const resetBtn = document.getElementById('resetBtn');
-    const showAllBtn = document.getElementById('showAllBtn');
+  const searchInput = document.getElementById('searchInput');
+  const dateFilter = document.getElementById('dateFilter');
+  const neighbourhoodFilter = document.getElementById('neighbourhoodFilter');
+  const resetBtn = document.getElementById('resetBtn');
+  const showAllBtn = document.getElementById('showAllBtn');
 
-    function escapeHtml(value) {
-      return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
 
-    function normalizeWalk(raw) {
-      return {
-        id: String(raw.id ?? ''),
-        walk_name: String(raw.walk_name ?? '').trim(),
-        date: String(raw.date ?? '').trim(),
-        time: String(raw.time ?? '').trim(),
-        neighbourhood: String(raw.neighbourhood ?? '').trim(),
-        walk_url: String(raw.walk_url ?? '').trim(),
-        lat: Number(raw.lat),
-        lng: Number(raw.lng)
-      };
-    }
+  function normalizeWalk(raw) {
+    return {
+      id: String(raw.id ?? ''),
+      walk_name: String(raw.walk_name ?? '').trim(),
+      date: String(raw.date ?? '').trim(),
+      time: String(raw.time ?? '').trim(),
+      neighbourhood: String(raw.neighbourhood ?? '').trim(),
+      walk_url: String(raw.walk_url ?? '').trim(),
+      lat: Number(raw.lat),
+      lng: Number(raw.lng)
+    };
+  }
 
-    function isValidWalk(walk) {
-      return walk.walk_name && Number.isFinite(walk.lat) && Number.isFinite(walk.lng);
-    }
+  function isValidWalk(walk) {
+    return walk.walk_name && Number.isFinite(walk.lat) && Number.isFinite(walk.lng);
+  }
 
-    function populateFilterOptions() {
-      const preferredDates = ['May 1', 'May 2', 'May 3'];
-      const preferredNeighbourhoods = ['Etobicoke', 'Scarborough', 'North York', 'Downtown'];
+  function populateFilterOptions() {
+    const preferredDates = ['May 1', 'May 2', 'May 3'];
+    const preferredNeighbourhoods = ['Etobicoke', 'Scarborough', 'North York', 'Downtown'];
 
-      const dates = [...new Set(allWalks.map(w => w.date).filter(Boolean))];
-      const neighbourhoods = [...new Set(allWalks.map(w => w.neighbourhood).filter(Boolean))];
+    const dates = [...new Set(allWalks.map(w => w.date).filter(Boolean))];
+    const neighbourhoods = [...new Set(allWalks.map(w => w.neighbourhood).filter(Boolean))];
 
-      preferredDates.forEach(date => {
-        if (dates.includes(date)) {
-          const option = document.createElement('option');
-          option.value = date;
-          option.textContent = date;
-          dateFilter.appendChild(option);
-        }
+    dateFilter.innerHTML = '<option value=\"\">All dates</option>';
+    neighbourhoodFilter.innerHTML = '<option value=\"\">All neighbourhoods</option>';
+
+    preferredDates.forEach(date => {
+      if (dates.includes(date)) {
+        const option = document.createElement('option');
+        option.value = date;
+        option.textContent = date;
+        dateFilter.appendChild(option);
+      }
+    });
+
+    dates
+      .filter(date => !preferredDates.includes(date))
+      .sort()
+      .forEach(date => {
+        const option = document.createElement('option');
+        option.value = date;
+        option.textContent = date;
+        dateFilter.appendChild(option);
       });
 
-      dates
-        .filter(date => !preferredDates.includes(date))
-        .sort()
-        .forEach(date => {
-          const option = document.createElement('option');
-          option.value = date;
-          option.textContent = date;
-          dateFilter.appendChild(option);
-        });
+    preferredNeighbourhoods.forEach(neighbourhood => {
+      if (neighbourhoods.includes(neighbourhood)) {
+        const option = document.createElement('option');
+        option.value = neighbourhood;
+        option.textContent = neighbourhood;
+        neighbourhoodFilter.appendChild(option);
+      }
+    });
 
-      preferredNeighbourhoods.forEach(neighbourhood => {
-        if (neighbourhoods.includes(neighbourhood)) {
-          const option = document.createElement('option');
-          option.value = neighbourhood;
-          option.textContent = neighbourhood;
-          neighbourhoodFilter.appendChild(option);
-        }
+    neighbourhoods
+      .filter(n => !preferredNeighbourhoods.includes(n))
+      .sort()
+      .forEach(neighbourhood => {
+        const option = document.createElement('option');
+        option.value = neighbourhood;
+        option.textContent = neighbourhood;
+        neighbourhoodFilter.appendChild(option);
+      });
+  }
+
+  function getInfoContent(walk) {
+    const dateTime = [walk.date, walk.time].filter(Boolean).join(' • ');
+    const linkHtml = walk.walk_url
+      ? `<div style="margin-top:8px;"><a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">View walk page</a></div>`
+      : '';
+
+    return `
+      <div style="max-width:260px; line-height:1.45; font-family:Arial, sans-serif;">
+        <div style="font-weight:700; font-size:16px; margin-bottom:6px;">${escapeHtml(walk.walk_name)}</div>
+        ${dateTime ? `<div style="margin-bottom:6px;">${escapeHtml(dateTime)}</div>` : ''}
+        ${linkHtml}
+      </div>
+    `;
+  }
+
+  function clearMarkers() {
+    for (const markerEntry of markers) {
+      markerEntry.marker.setMap(null);
+    }
+    markers = [];
+  }
+
+  function highlightRow(walkId) {
+    activeRowId = walkId;
+    document.querySelectorAll('tbody tr').forEach(tr => {
+      tr.classList.toggle('active-row', tr.dataset.id === walkId);
+    });
+  }
+
+  function openWalkOnMap(walkId) {
+    const walk = filteredWalks.find(w => w.id === walkId) || allWalks.find(w => w.id === walkId);
+    if (!walk) return;
+
+    const markerEntry = markers.find(m => m.walkId === walkId);
+    if (!markerEntry) return;
+
+    map.panTo({ lat: walk.lat, lng: walk.lng });
+    map.setZoom(14);
+    infoWindow.setContent(getInfoContent(walk));
+    infoWindow.open({ map, anchor: markerEntry.marker });
+    highlightRow(walkId);
+
+    const row = document.querySelector(`tbody tr[data-id="${CSS.escape(walkId)}"]`);
+    if (row) {
+      row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  function renderMarkers(walks) {
+    clearMarkers();
+
+    walks.forEach(walk => {
+      const marker = new google.maps.Marker({
+        position: { lat: walk.lat, lng: walk.lng },
+        map: map,
+        title: walk.walk_name
       });
 
-      neighbourhoods
-        .filter(n => !preferredNeighbourhoods.includes(n))
-        .sort()
-        .forEach(neighbourhood => {
-          const option = document.createElement('option');
-          option.value = neighbourhood;
-          option.textContent = neighbourhood;
-          neighbourhoodFilter.appendChild(option);
-        });
+      marker.addListener('click', () => {
+        infoWindow.setContent(getInfoContent(walk));
+        infoWindow.open({ map, anchor: marker });
+        highlightRow(walk.id);
+      });
+
+      markers.push({ walkId: walk.id, marker });
+    });
+
+    if (walks.length) {
+      const bounds = new google.maps.LatLngBounds();
+      walks.forEach(walk => bounds.extend({ lat: walk.lat, lng: walk.lng }));
+      map.fitBounds(bounds);
+
+      google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
+        if (map.getZoom() > 14) map.setZoom(14);
+      });
+    }
+  }
+
+  function renderTable(walks) {
+    tableBody.innerHTML = '';
+    mobileCards.innerHTML = '';
+
+    if (!walks.length) {
+      emptyTable.style.display = 'block';
+      return;
     }
 
-    function getInfoContent(walk) {
-      const dateTime = [walk.date, walk.time].filter(Boolean).join(' • ');
-      const linkHtml = walk.walk_url
-        ? `<div style="margin-top:8px;"><a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">View walk page</a></div>`
-        : '';
+    emptyTable.style.display = 'none';
 
-      return `
-        <div style="max-width:260px; line-height:1.45; font-family:Arial, sans-serif;">
-          <div style="font-weight:700; font-size:16px; margin-bottom:6px;">${escapeHtml(walk.walk_name)}</div>
-          ${dateTime ? `<div style="margin-bottom:6px;">${escapeHtml(dateTime)}</div>` : ''}
-          ${linkHtml}
-        </div>
+    walks.forEach(walk => {
+      const row = document.createElement('tr');
+      row.dataset.id = walk.id;
+      row.innerHTML = `
+        <td><button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button></td>
+        <td>${escapeHtml(walk.date)}</td>
+        <td>${escapeHtml(walk.time)}</td>
+        <td>${escapeHtml(walk.neighbourhood)}</td>
+        <td>${walk.walk_url ? `<a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">Open</a>` : '—'}</td>
       `;
-    }
 
-    function clearMarkers() {
-      for (const markerEntry of markers) {
-        markerEntry.marker.setMap(null);
-      }
-      markers = [];
-    }
+      row.querySelector('.walk-link').addEventListener('click', () => openWalkOnMap(walk.id));
+      tableBody.appendChild(row);
 
-    function highlightRow(walkId) {
-      activeRowId = walkId;
-      document.querySelectorAll('tbody tr').forEach(tr => {
-        tr.classList.toggle('active-row', tr.dataset.id === walkId);
-      });
-    }
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h3><button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button></h3>
+        <p><strong>Date:</strong> ${escapeHtml(walk.date || '—')}</p>
+        <p><strong>Time:</strong> ${escapeHtml(walk.time || '—')}</p>
+        <p><strong>Neighbourhood:</strong> ${escapeHtml(walk.neighbourhood || '—')}</p>
+        <p><strong>Walk Page:</strong> ${walk.walk_url ? `<a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">Open</a>` : '—'}</p>
+      `;
+      card.querySelector('.walk-link').addEventListener('click', () => openWalkOnMap(walk.id));
+      mobileCards.appendChild(card);
+    });
+  }
 
-    function openWalkOnMap(walkId) {
-      const walk = filteredWalks.find(w => w.id === walkId) || allWalks.find(w => w.id === walkId);
-      if (!walk) return;
+  function applyFilters() {
+    const searchValue = searchInput.value.trim().toLowerCase();
+    const dateValue = dateFilter.value;
+    const neighbourhoodValue = neighbourhoodFilter.value;
 
-      const markerEntry = markers.find(m => m.walkId === walkId);
-      if (!markerEntry) return;
+    filteredWalks = allWalks.filter(walk => {
+      const matchesSearch = !searchValue || walk.walk_name.toLowerCase().includes(searchValue);
+      const matchesDate = !dateValue || walk.date === dateValue;
+      const matchesNeighbourhood = !neighbourhoodValue || walk.neighbourhood === neighbourhoodValue;
+      return matchesSearch && matchesDate && matchesNeighbourhood;
+    });
 
-      map.panTo({ lat: walk.lat, lng: walk.lng });
-      map.setZoom(14);
-      infoWindow.setContent(getInfoContent(walk));
-      infoWindow.open({ map, anchor: markerEntry.marker });
-      highlightRow(walkId);
+    resultCountEl.textContent = `${filteredWalks.length} walk${filteredWalks.length === 1 ? '' : 's'}`;
+    renderMarkers(filteredWalks);
+    renderTable(filteredWalks);
+  }
 
-      const row = document.querySelector(`tbody tr[data-id="${CSS.escape(walkId)}"]`);
-      if (row) {
-        row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    }
+  function resetFilters() {
+    searchInput.value = '';
+    dateFilter.value = '';
+    neighbourhoodFilter.value = '';
+    applyFilters();
+  }
 
-    function renderMarkers(walks) {
-      clearMarkers();
+  async function loadWalks() {
+    statusEl.textContent = 'Loading walks...';
 
-      walks.forEach(walk => {
-        const marker = new google.maps.Marker({
-          position: { lat: walk.lat, lng: walk.lng },
-          map: map,
-          title: walk.walk_name
-        });
+    try {
+      const response = await fetch(DATA_URL, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-        marker.addListener('click', () => {
-          infoWindow.setContent(getInfoContent(walk));
-          infoWindow.open({ map, anchor: marker });
-          highlightRow(walk.id);
-        });
+      const raw = await response.json();
+      allWalks = raw.map(normalizeWalk).filter(isValidWalk);
 
-        markers.push({ walkId: walk.id, marker });
-      });
-
-      if (walks.length) {
-        const bounds = new google.maps.LatLngBounds();
-        walks.forEach(walk => bounds.extend({ lat: walk.lat, lng: walk.lng }));
-        map.fitBounds(bounds);
-
-        google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
-          if (map.getZoom() > 14) map.setZoom(14);
-        });
-      }
-    }
-
-    function renderTable(walks) {
-      tableBody.innerHTML = '';
-      mobileCards.innerHTML = '';
-
-      if (!walks.length) {
-        emptyTable.style.display = 'block';
-        return;
-      }
-
-      emptyTable.style.display = 'none';
-
-      walks.forEach(walk => {
-        const row = document.createElement('tr');
-        row.dataset.id = walk.id;
-        row.innerHTML = `
-          <td><button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button></td>
-          <td>${escapeHtml(walk.date)}</td>
-          <td>${escapeHtml(walk.time)}</td>
-          <td>${escapeHtml(walk.neighbourhood)}</td>
-          <td>${walk.walk_url ? `<a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">Open</a>` : '—'}</td>
-        `;
-
-        row.querySelector('.walk-link').addEventListener('click', () => openWalkOnMap(walk.id));
-        tableBody.appendChild(row);
-
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <h3><button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button></h3>
-          <p><strong>Date:</strong> ${escapeHtml(walk.date || '—')}</p>
-          <p><strong>Time:</strong> ${escapeHtml(walk.time || '—')}</p>
-          <p><strong>Neighbourhood:</strong> ${escapeHtml(walk.neighbourhood || '—')}</p>
-          <p><strong>Walk Page:</strong> ${walk.walk_url ? `<a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">Open</a>` : '—'}</p>
-        `;
-        card.querySelector('.walk-link').addEventListener('click', () => openWalkOnMap(walk.id));
-        mobileCards.appendChild(card);
-      });
-    }
-
-    function applyFilters() {
-      const searchValue = searchInput.value.trim().toLowerCase();
-      const dateValue = dateFilter.value;
-      const neighbourhoodValue = neighbourhoodFilter.value;
-
-      filteredWalks = allWalks.filter(walk => {
-        const matchesSearch = !searchValue || walk.walk_name.toLowerCase().includes(searchValue);
-        const matchesDate = !dateValue || walk.date === dateValue;
-        const matchesNeighbourhood = !neighbourhoodValue || walk.neighbourhood === neighbourhoodValue;
-        return matchesSearch && matchesDate && matchesNeighbourhood;
-      });
-
-      resultCountEl.textContent = `${filteredWalks.length} walk${filteredWalks.length === 1 ? '' : 's'}`;
-      renderMarkers(filteredWalks);
-      renderTable(filteredWalks);
-    }
-
-    function resetFilters() {
-      searchInput.value = '';
-      dateFilter.value = '';
-      neighbourhoodFilter.value = '';
-      applyFilters();
-    }
-
-    async function loadWalks() {
-      statusEl.textContent = 'Loading walks...';
-
-      try {
-        const response = await fetch(DATA_URL, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const raw = await response.json();
-        allWalks = raw.map(normalizeWalk).filter(isValidWalk);
-
-        populateFilterOptions();
-        filteredWalks = [...allWalks];
-        renderMarkers(filteredWalks);
-        renderTable(filteredWalks);
-        resultCountEl.textContent = `${filteredWalks.length} walk${filteredWalks.length === 1 ? '' : 's'}`;
-        statusEl.textContent = `${allWalks.length} walk${allWalks.length === 1 ? '' : 's'} loaded.`;
-      } catch (error) {
-        console.error(error);
-        statusEl.textContent = 'Could not load walk data. Check your Apps Script URL and sharing settings.';
-      }
-    }
-
-    async function initMap() {
-      map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: 43.6532, lng: -79.3832 },
-        zoom: 11,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: true
-      });
-
-      infoWindow = new google.maps.InfoWindow();
-      await loadWalks();
-    }
-
-    function loadGoogleMapsScript() {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=initMap`;
-        script.async = true;
-        script.defer = true;
-        window.initMap = initMap;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    }
-
-    searchInput.addEventListener('input', applyFilters);
-    dateFilter.addEventListener('change', applyFilters);
-    neighbourhoodFilter.addEventListener('change', applyFilters);
-    resetBtn.addEventListener('click', resetFilters);
-    showAllBtn.addEventListener('click', () => {
+      populateFilterOptions();
       filteredWalks = [...allWalks];
       renderMarkers(filteredWalks);
       renderTable(filteredWalks);
       resultCountEl.textContent = `${filteredWalks.length} walk${filteredWalks.length === 1 ? '' : 's'}`;
       statusEl.textContent = `${allWalks.length} walk${allWalks.length === 1 ? '' : 's'} loaded.`;
+    } catch (error) {
+      console.error(error);
+      statusEl.textContent = 'Could not load walk data. Check your Apps Script URL and sharing settings.';
+    }
+  }
+
+  async function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: { lat: 43.6532, lng: -79.3832 },
+      zoom: 11,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: true
     });
 
-    loadGoogleMapsScript().catch(error => {
-      console.error(error);
-      statusEl.textContent = 'Could not load Google Maps. Check your API key.';
-    });
-  </script>
+    infoWindow = new google.maps.InfoWindow();
+    await loadWalks();
+  }
+
+  searchInput.addEventListener('input', applyFilters);
+  dateFilter.addEventListener('change', applyFilters);
+  neighbourhoodFilter.addEventListener('change', applyFilters);
+  resetBtn.addEventListener('click', resetFilters);
+  showAllBtn.addEventListener('click', () => {
+    filteredWalks = [...allWalks];
+    renderMarkers(filteredWalks);
+    renderTable(filteredWalks);
+    resultCountEl.textContent = `${filteredWalks.length} walk${filteredWalks.length === 1 ? '' : 's'}`;
+    statusEl.textContent = `${allWalks.length} walk${allWalks.length === 1 ? '' : 's'} loaded.`;
+  });
+
+  window.initMap = initMap;
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAO0OrBnbW_lnszGr6N8rojaJ1CWuaWd8M&callback=initMap"></script>
 </body>
 </html>
