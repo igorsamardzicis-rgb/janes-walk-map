@@ -287,7 +287,28 @@
   let filteredWalks = [];
   let markers = [];
   let activeRowId = null;
+  function formatDate(value) {
+  if (!value) return '';
 
+  const date = new Date(value);
+
+  return date.toLocaleDateString('en-CA', {
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+function formatTime(value) {
+  if (!value) return '';
+
+  const date = new Date(value);
+
+  return date.toLocaleTimeString('en-CA', {
+    hour: 'numeric',
+    minute: '2-digit'
+  });
+}
+  
   const statusEl = document.getElementById('status');
   const resultCountEl = document.getElementById('resultCount');
   const tableBody = document.getElementById('walkTableBody');
@@ -376,7 +397,10 @@
   }
 
   function getInfoContent(walk) {
-    const dateTime = [walk.date, walk.time].filter(Boolean).join(' • ');
+    const dateTime = [
+  formatDate(walk.date),
+  formatTime(walk.time)
+].filter(Boolean).join(' • ');
     const linkHtml = walk.walk_url
       ? `<div style="margin-top:8px;"><a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">View walk page</a></div>`
       : '';
@@ -469,8 +493,8 @@
       row.dataset.id = walk.id;
       row.innerHTML = `
         <td><button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button></td>
-        <td>${escapeHtml(walk.date)}</td>
-        <td>${escapeHtml(walk.time)}</td>
+        <td>${escapeHtml(formatDate(walk.date))}</td>
+        <td>${escapeHtml(formatTime(walk.time))}</td>
         <td>${escapeHtml(walk.neighbourhood)}</td>
         <td>${walk.walk_url ? `<a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">Open</a>` : '—'}</td>
       `;
@@ -482,8 +506,8 @@
       card.className = 'card';
       card.innerHTML = `
         <h3><button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button></h3>
-        <p><strong>Date:</strong> ${escapeHtml(walk.date || '—')}</p>
-        <p><strong>Time:</strong> ${escapeHtml(walk.time || '—')}</p>
+        <p><strong>Date:</strong> ${escapeHtml(formatDate(walk.date) || '—')}</p>
+        <p><strong>Time:</strong> ${escapeHtml(formatTime(walk.time) || '—')}</p>
         <p><strong>Neighbourhood:</strong> ${escapeHtml(walk.neighbourhood || '—')}</p>
         <p><strong>Walk Page:</strong> ${walk.walk_url ? `<a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">Open</a>` : '—'}</p>
       `;
