@@ -501,11 +501,9 @@ function getDirectionsUrl(walk) {
   <td>${escapeHtml(formatTime(walk.time))}</td>
   <td>${escapeHtml(walk.neighbourhood)}</td>
   <td>${walk.walk_url ? `<a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">Open</a>` : '—'}</td>
-  <td>
-    ${getDirectionsUrl(walk)
-      ? `<a href="${getDirectionsUrl(walk)}" target="_blank" rel="noopener noreferrer">Directions</a>`
-      : '—'}
-  </td>
+<td>
+  <a href="https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}" target="_blank" rel="noopener noreferrer">Directions</a>
+</td>
 `;
 
       row.querySelector('.walk-link').addEventListener('click', () => openWalkOnMap(walk.id));
