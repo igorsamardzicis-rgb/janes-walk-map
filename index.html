@@ -496,12 +496,17 @@ function getDirectionsUrl(walk) {
       const row = document.createElement('tr');
       row.dataset.id = walk.id;
       row.innerHTML = `
-        <td><button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button></td>
-        <td>${escapeHtml(formatDate(walk.date))}</td>
-        <td>${escapeHtml(formatTime(walk.time))}</td>
-        <td>${escapeHtml(walk.neighbourhood)}</td>
-        <td>${walk.walk_url ? `<a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">Open</a>` : '—'}</td>
-      `;
+  <td><button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button></td>
+  <td>${escapeHtml(formatDate(walk.date))}</td>
+  <td>${escapeHtml(formatTime(walk.time))}</td>
+  <td>${escapeHtml(walk.neighbourhood)}</td>
+  <td>${walk.walk_url ? `<a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">Open</a>` : '—'}</td>
+  <td>
+    ${getDirectionsUrl(walk)
+      ? `<a href="${getDirectionsUrl(walk)}" target="_blank" rel="noopener noreferrer">Directions</a>`
+      : '—'}
+  </td>
+`;
 
       row.querySelector('.walk-link').addEventListener('click', () => openWalkOnMap(walk.id));
       tableBody.appendChild(row);
