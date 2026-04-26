@@ -331,6 +331,13 @@ td:first-child {
     width: 100%;
   }
 }
+    /* Smaller button ONLY inside map popup */
+.popup-btn {
+  padding: 4px 8px !important;
+  font-size: 13px;
+  min-height: auto !important;
+  line-height: 1.2;
+}
   </style>
 </head>
 <body>
@@ -580,9 +587,9 @@ function getDirectionsUrl(walk) {
   formatDate(walk.date),
   formatTime(walk.time)
 ].filter(Boolean).join(' • ');
-   const linkHtml = walk.walk_url
-  ? `<div style="margin-top:12px;">
-      <button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">
+const linkHtml = walk.walk_url
+  ? `<div style="margin-top:6px;">
+      <button class="action-btn popup-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">
         Walk Page
       </button>
     </div>`
