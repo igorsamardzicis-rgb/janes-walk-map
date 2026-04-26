@@ -106,7 +106,7 @@ td:nth-child(6) {
 
 .filters {
   display: grid;
-  grid-template-columns: minmax(320px, 2fr) 140px 140px minmax(220px, 1.4fr) auto;
+  grid-template-columns: 1.5fr 0.85fr 0.85fr 1.45fr 280px;
   gap: 12px;
   align-items: end;
   margin-bottom: 16px;
@@ -131,9 +131,14 @@ td:nth-child(6) {
     }
 
 .actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
   align-items: end;
+}
+
+.actions button {
+  width: 100%;
   white-space: nowrap;
 }
 
