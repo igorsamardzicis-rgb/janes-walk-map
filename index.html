@@ -106,7 +106,7 @@ td:nth-child(6) {
 
     .filters {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -327,7 +327,15 @@ td:first-child {
           <option value="">All dates</option>
         </select>
       </div>
-
+<div class="field">
+  <label for="timeFilter">Time</label>
+  <select id="timeFilter">
+    <option value="">All times</option>
+    <option value="morning">Morning</option>
+    <option value="afternoon">Afternoon</option>
+    <option value="evening">Evening</option>
+  </select>
+</div>
       <div class="field">
         <label for="neighbourhoodFilter">Neighbourhood</label>
         <select id="neighbourhoodFilter">
@@ -444,7 +452,13 @@ function formatTime(value) {
     minute: '2-digit'
   });
 }
-  
+  function getTimePeriod(value) {
+  const minutes = getSortTimeValue(value);
+
+  if (minutes < 12 * 60) return 'morning';
+  if (minutes < 17 * 60) return 'afternoon';
+  return 'evening';
+}
   const statusEl = document.getElementById('status');
   const resultCountEl = document.getElementById('resultCount');
   const tableBody = document.getElementById('walkTableBody');
@@ -453,6 +467,7 @@ function formatTime(value) {
 
   const searchInput = document.getElementById('searchInput');
   const dateFilter = document.getElementById('dateFilter');
+  const timeFilter = document.getElementById('timeFilter');
   const neighbourhoodFilter = document.getElementById('neighbourhoodFilter');
   const resetBtn = document.getElementById('resetBtn');
   const showAllBtn = document.getElementById('showAllBtn');
@@ -677,12 +692,14 @@ const marker = new google.maps.Marker({
     const searchValue = searchInput.value.trim().toLowerCase();
     const dateValue = dateFilter.value;
     const neighbourhoodValue = neighbourhoodFilter.value;
+    const timeValue = timeFilter.value;
 
     filteredWalks = allWalks.filter(walk => {
       const matchesSearch = !searchValue || walk.walk_name.toLowerCase().includes(searchValue);
       const matchesDate = !dateValue || walk.date === dateValue;
       const matchesNeighbourhood = !neighbourhoodValue || walk.neighbourhood === neighbourhoodValue;
-      return matchesSearch && matchesDate && matchesNeighbourhood;
+      const matchesTime = !timeValue || getTimePeriod(walk.time) === timeValue;
+      return matchesSearch && matchesDate && matchesTime && matchesNeighbourhood;
     });
 sortWalks(filteredWalks);
     resultCountEl.textContent = `${filteredWalks.length} walk${filteredWalks.length === 1 ? '' : 's'}`;
@@ -694,6 +711,7 @@ sortWalks(filteredWalks);
     searchInput.value = '';
     dateFilter.value = '';
     neighbourhoodFilter.value = '';
+    timeFilter.value = '';
     applyFilters();
   }
 
@@ -769,6 +787,7 @@ async function loadWeather() {
 
   searchInput.addEventListener('input', applyFilters);
   dateFilter.addEventListener('change', applyFilters);
+  timeFilter.addEventListener('change', applyFilters);
   neighbourhoodFilter.addEventListener('change', applyFilters);
   resetBtn.addEventListener('click', resetFilters);
   showAllBtn.addEventListener('click', () => {
