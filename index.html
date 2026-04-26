@@ -588,9 +588,13 @@ function getDirectionsUrl(walk) {
   formatTime(walk.time)
 ].filter(Boolean).join(' • ');
 const linkHtml = walk.walk_url
-  ? `<div style="margin-top:6px;">
+  ? `<div style="margin-top:6px; display:flex; gap:8px; align-items:center;">
       <button class="action-btn popup-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">
         Walk Page
+      </button>
+
+      <button class="action-btn primary popup-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
+        Directions
       </button>
     </div>`
   : '';
