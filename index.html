@@ -347,7 +347,10 @@ function formatTime(value) {
   function isValidWalk(walk) {
     return walk.walk_name && Number.isFinite(walk.lat) && Number.isFinite(walk.lng);
   }
-
+function getDirectionsUrl(walk) {
+  if (!Number.isFinite(walk.lat) || !Number.isFinite(walk.lng)) return '';
+  return `https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}`;
+}
   function populateFilterOptions() {
     const preferredDates = ['May 1', 'May 2', 'May 3'];
     const preferredNeighbourhoods = ['Etobicoke', 'Scarborough', 'North York', 'Downtown'];
