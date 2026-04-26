@@ -500,9 +500,16 @@ function getDirectionsUrl(walk) {
   <td>${escapeHtml(formatDate(walk.date))}</td>
   <td>${escapeHtml(formatTime(walk.time))}</td>
   <td>${escapeHtml(walk.neighbourhood)}</td>
-  <td>${walk.walk_url ? `<a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">Open</a>` : '—'}</td>
 <td>
-  <a href="https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}" target="_blank" rel="noopener noreferrer">Directions</a>
+  ${walk.walk_url 
+    ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Open</button>` 
+    : '—'}
+</td>
+
+<td>
+  <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
+    Directions
+  </button>
 </td>
 `;
 
