@@ -694,12 +694,9 @@ const marker = new google.maps.Marker({
         <p><strong>Date:</strong> ${escapeHtml(formatDate(walk.date) || '—')}</p>
         <p><strong>Time:</strong> ${escapeHtml(formatTime(walk.time) || '—')}</p>
         <p><strong>Neighbourhood:</strong> ${escapeHtml(walk.neighbourhood || '—')}</p>
-        <p>
-  <strong>Walk Page:</strong><br>
-  ${walk.walk_url 
-    ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
-    : '—'}
-</p>
+        ${walk.walk_url 
+  ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
+  : ''}
       `;
       card.querySelector('.walk-link').addEventListener('click', () => openWalkOnMap(walk.id));
       mobileCards.appendChild(card);
