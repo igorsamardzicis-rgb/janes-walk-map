@@ -187,14 +187,17 @@ td:nth-child(6) {
       background: var(--soft);
     }
 
-    th, td {
-      text-align: left;
-      padding: 14px 12px;
-      border-bottom: 1px solid #ececec;
-      font-size: 14px;
-      vertical-align: top;
-    }
-
+th, td {
+  text-align: center;
+  padding: 14px 12px;
+  border-bottom: 1px solid #ececec;
+  font-size: 14px;
+  vertical-align: middle;
+}
+th:first-child,
+td:first-child {
+  text-align: left;
+}
     th {
       font-size: 13px;
       font-weight: 700;
@@ -346,29 +349,55 @@ td:nth-child(6) {
   const DATA_URL = 'https://script.google.com/macros/s/AKfycbzNyRqrftCnDaxXuMk_lV5kOdyqucar5yDn_eJT7gwgsQL9ltqMjRy6exyD5L4grwru7Q/exec';
   const GOOGLE_MAPS_API_KEY = 'AIzaSyAO0OrBnbW_lnszGr6N8rojaJ1CWuaWd8M';
 
-  let map;
-  let infoWindow;
-  let allWalks = [];
-  let filteredWalks = [];
-  let markers = [];
-  let activeRowId = null;
-  function formatDate(value) {
-  if (!value) return '';
-
-  const date = new Date(value);
-
-  return date.toLocaleDateString('en-CA', {
-    month: 'long',
-    day: 'numeric'
-  });
-}
 let map;
-  let infoWindow;
-  let allWalks = [];
-  let filteredWalks = [];
-  let markers = [];
-  let activeRowId = null;
-  function formatDate(value) {
+let infoWindow;
+let allWalks = [];
+let filteredWalks = [];
+let markers = [];
+let activeRowId = null;
+
+function getSortDateValue(value) {
+  const text = String(value || '');
+
+  if (text.includes('May 1')) return 1;
+  if (text.includes('May 2')) return 2;
+  if (text.includes('May 3')) return 3;
+
+  return 99;
+}
+
+function getSortTimeValue(value) {
+  const date = new Date(value);
+
+  if (!isNaN(date.getTime())) {
+    return date.getHours() * 60 + date.getMinutes();
+  }
+
+  const text = String(value || '').trim().toLowerCase();
+  const match = text.match(/(\d{1,2}):(\d{2})\s*(am|pm|a\.m\.|p\.m\.)?/);
+
+  if (!match) return 9999;
+
+  let hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  const period = match[3];
+
+  if (period && period.includes('p') && hours !== 12) hours += 12;
+  if (period && period.includes('a') && hours === 12) hours = 0;
+
+  return hours * 60 + minutes;
+}
+
+function sortWalks(walks) {
+  return walks.sort((a, b) => {
+    const dateDiff = getSortDateValue(a.date) - getSortDateValue(b.date);
+    if (dateDiff !== 0) return dateDiff;
+
+    return getSortTimeValue(a.time) - getSortTimeValue(b.time);
+  });
+}
+
+function formatDate(value) {
   if (!value) return '';
 
   const date = new Date(value);
@@ -378,6 +407,7 @@ let map;
     day: 'numeric'
   });
 }
+
 function formatTime(value) {
   if (!value) return '';
 
