@@ -580,9 +580,13 @@ function getDirectionsUrl(walk) {
   formatDate(walk.date),
   formatTime(walk.time)
 ].filter(Boolean).join(' • ');
-    const linkHtml = walk.walk_url
-      ? `<div style="margin-top:8px;"><a href="${escapeHtml(walk.walk_url)}" target="_blank" rel="noopener noreferrer">View walk page</a></div>`
-      : '';
+   const linkHtml = walk.walk_url
+  ? `<div style="margin-top:12px;">
+      <button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">
+        Walk Page
+      </button>
+    </div>`
+  : '';
 
     return `
       <div style="max-width:260px; line-height:1.45; font-family:Arial, sans-serif;">
