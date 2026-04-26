@@ -564,11 +564,19 @@ function getDirectionsUrl(walk) {
     clearMarkers();
 
     walks.forEach(walk => {
-      const marker = new google.maps.Marker({
-        position: { lat: walk.lat, lng: walk.lng },
-        map: map,
-        title: walk.walk_name
-      });
+const marker = new google.maps.Marker({
+  position: { lat: walk.lat, lng: walk.lng },
+  map: map,
+  title: walk.walk_name,
+  icon: {
+    path: google.maps.SymbolPath.CIRCLE,
+    scale: 10,
+    fillColor: "#0b57d0",   // your blue
+    fillOpacity: 1,
+    strokeColor: "#ffffff",
+    strokeWeight: 2
+  }
+});
 
       marker.addListener('click', () => {
         infoWindow.setContent(getInfoContent(walk));
