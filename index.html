@@ -283,6 +283,29 @@ td:first-child {
         display: block;
       }
     }
+    .weather-box {
+  margin: 16px 0;
+}
+
+.weather-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.weather-card {
+  border: 1px solid #d9d9d9;
+  border-radius: 12px;
+  padding: 12px;
+  background: #f7f7f7;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .weather-cards {
+    grid-template-columns: 1fr;
+  }
+}
   </style>
 </head>
 <body>
@@ -322,7 +345,10 @@ td:first-child {
       <div id="resultCount">0 walks</div>
       <div>Tip: tap a walk name below to open it on the map.</div>
     </div>
-
+<div id="weatherBox" class="weather-box">
+  <div id="weatherStatus">Loading weather...</div>
+  <div id="weatherCards" class="weather-cards"></div>
+</div>
     <div id="map" aria-label="Map of Jane's Walk locations"></div>
 
     <div class="table-wrap">
@@ -692,7 +718,41 @@ sortWalks(filteredWalks);
       statusEl.textContent = 'Could not load walk data. Check your Apps Script URL and sharing settings.';
     }
   }
+async function loadWeather() {
+  const weatherStatus = document.getElementById('weatherStatus');
+  const weatherCards = document.getElementById('weatherCards');
 
+  const url = 'https://api.open-meteo.com/v1/forecast?latitude=43.6532&longitude=-79.3832&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=America%2FToronto';
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    const wantedDates = {
+      '2026-05-01': 'May 1',
+      '2026-05-02': 'May 2',
+      '2026-05-03': 'May 3'
+    };
+
+    weatherCards.innerHTML = '';
+
+    data.daily.time.forEach((date, index) => {
+      if (!wantedDates[date]) return;
+
+      weatherCards.innerHTML += `
+        <div class="weather-card">
+          <strong>${wantedDates[date]}</strong>
+          <div>${Math.round(data.daily.temperature_2m_max[index])}° / ${Math.round(data.daily.temperature_2m_min[index])}°C</div>
+          <div>${data.daily.precipitation_probability_max[index] ?? 0}% rain</div>
+        </div>
+      `;
+    });
+
+    weatherStatus.textContent = '';
+  } catch (error) {
+    weatherStatus.textContent = 'Weather could not load.';
+  }
+}
   async function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
       center: { lat: 43.6532, lng: -79.3832 },
@@ -704,6 +764,7 @@ sortWalks(filteredWalks);
 
     infoWindow = new google.maps.InfoWindow();
     await loadWalks();
+    await loadWeather();
   }
 
   searchInput.addEventListener('input', applyFilters);
