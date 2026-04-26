@@ -362,7 +362,22 @@ td:nth-child(6) {
     day: 'numeric'
   });
 }
+let map;
+  let infoWindow;
+  let allWalks = [];
+  let filteredWalks = [];
+  let markers = [];
+  let activeRowId = null;
+  function formatDate(value) {
+  if (!value) return '';
 
+  const date = new Date(value);
+
+  return date.toLocaleDateString('en-CA', {
+    month: 'long',
+    day: 'numeric'
+  });
+}
 function formatTime(value) {
   if (!value) return '';
 
@@ -605,7 +620,7 @@ function getDirectionsUrl(walk) {
       const matchesNeighbourhood = !neighbourhoodValue || walk.neighbourhood === neighbourhoodValue;
       return matchesSearch && matchesDate && matchesNeighbourhood;
     });
-
+sortWalks(filteredWalks);
     resultCountEl.textContent = `${filteredWalks.length} walk${filteredWalks.length === 1 ? '' : 's'}`;
     renderMarkers(filteredWalks);
     renderTable(filteredWalks);
@@ -626,7 +641,7 @@ function getDirectionsUrl(walk) {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const raw = await response.json();
-      allWalks = raw.map(normalizeWalk).filter(isValidWalk);
+      allWalks = sortWalks(raw.map(normalizeWalk).filter(isValidWalk));
 
       populateFilterOptions();
       filteredWalks = [...allWalks];
