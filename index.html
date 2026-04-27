@@ -473,7 +473,15 @@ function formatDate(value) {
     day: 'numeric'
   });
 }
+function getDateFilterLabel(value) {
+  const cleanDate = formatDate(value);
 
+  if (cleanDate === 'May 1') return 'Friday, May 1';
+  if (cleanDate === 'May 2') return 'Saturday, May 2';
+  if (cleanDate === 'May 3') return 'Sunday, May 3';
+
+  return cleanDate;
+}
 function formatTime(value) {
   if (!value) return '';
 
@@ -533,24 +541,50 @@ function getDirectionsUrl(walk) {
   if (!Number.isFinite(walk.lat) || !Number.isFinite(walk.lng)) return '';
   return `https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}`;
 }
-  function populateFilterOptions() {
-    const preferredDates = ['May 1', 'May 2', 'May 3'];
-    const preferredNeighbourhoods = ['Etobicoke', 'Scarborough', 'North York', 'Downtown'];
+function populateFilterOptions() {
 
-    const dates = [...new Set(allWalks.map(w => w.date).filter(Boolean))];
-    const neighbourhoods = [...new Set(allWalks.map(w => w.neighbourhood).filter(Boolean))];
+  const preferredNeighbourhoods = ['Etobicoke', 'Scarborough', 'North York', 'Downtown'];
 
-    dateFilter.innerHTML = '<option value=\"\">All dates</option>';
-    neighbourhoodFilter.innerHTML = '<option value=\"\">All neighbourhoods</option>';
+  const neighbourhoods = [...new Set(allWalks.map(w => w.neighbourhood).filter(Boolean))];
 
-    preferredDates.forEach(date => {
-      if (dates.includes(date)) {
-        const option = document.createElement('option');
-        option.value = date;
-        option.textContent = date;
-        dateFilter.appendChild(option);
-      }
+  // ✅ DATE DROPDOWN
+  dateFilter.innerHTML = '<option value="">All dates</option>';
+
+  const preferredDates = [
+    { value: 'May 1', label: 'Friday, May 1' },
+    { value: 'May 2', label: 'Saturday, May 2' },
+    { value: 'May 3', label: 'Sunday, May 3' }
+  ];
+
+  preferredDates.forEach(date => {
+    const option = document.createElement('option');
+    option.value = date.value;
+    option.textContent = date.label;
+    dateFilter.appendChild(option);
+  });
+
+  // ✅ NEIGHBOURHOOD DROPDOWN
+  neighbourhoodFilter.innerHTML = '<option value="">All neighbourhoods</option>';
+
+  preferredNeighbourhoods.forEach(neighbourhood => {
+    if (neighbourhoods.includes(neighbourhood)) {
+      const option = document.createElement('option');
+      option.value = neighbourhood;
+      option.textContent = neighbourhood;
+      neighbourhoodFilter.appendChild(option);
+    }
+  });
+
+  neighbourhoods
+    .filter(n => !preferredNeighbourhoods.includes(n))
+    .sort()
+    .forEach(neighbourhood => {
+      const option = document.createElement('option');
+      option.value = neighbourhood;
+      option.textContent = neighbourhood;
+      neighbourhoodFilter.appendChild(option);
     });
+}
 
     dates
       .filter(date => !preferredDates.includes(date))
@@ -744,7 +778,7 @@ const marker = new google.maps.Marker({
 
     filteredWalks = allWalks.filter(walk => {
       const matchesSearch = !searchValue || walk.walk_name.toLowerCase().includes(searchValue);
-      const matchesDate = !dateValue || walk.date === dateValue;
+      const matchesDate = !dateValue || formatDate(walk.date) === dateValue;
       const matchesNeighbourhood = !neighbourhoodValue || walk.neighbourhood === neighbourhoodValue;
       const matchesTime = !timeValue || getTimePeriod(walk.time) === timeValue;
       return matchesSearch && matchesDate && matchesTime && matchesNeighbourhood;
