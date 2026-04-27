@@ -586,35 +586,7 @@ function populateFilterOptions() {
     });
 }
 
-    dates
-      .filter(date => !preferredDates.includes(date))
-      .sort()
-      .forEach(date => {
-        const option = document.createElement('option');
-        option.value = date;
-        option.textContent = date;
-        dateFilter.appendChild(option);
-      });
 
-    preferredNeighbourhoods.forEach(neighbourhood => {
-      if (neighbourhoods.includes(neighbourhood)) {
-        const option = document.createElement('option');
-        option.value = neighbourhood;
-        option.textContent = neighbourhood;
-        neighbourhoodFilter.appendChild(option);
-      }
-    });
-
-    neighbourhoods
-      .filter(n => !preferredNeighbourhoods.includes(n))
-      .sort()
-      .forEach(neighbourhood => {
-        const option = document.createElement('option');
-        option.value = neighbourhood;
-        option.textContent = neighbourhood;
-        neighbourhoodFilter.appendChild(option);
-      });
-  }
 
   function getInfoContent(walk) {
     const dateTime = [
