@@ -46,12 +46,14 @@ th:nth-child(6),
 td:nth-child(6) {
   min-width: 150px;
 }
-    .action-btn {
+.action-btn {
   border: 1px solid #d9d9d9;
   background: #fff;
   padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
   cursor: pointer;
 }
 
@@ -417,6 +419,11 @@ td:first-child {
   color: #b8aa95;
   font-weight: 700;
   margin-left: 6px;
+}
+    .action-btn {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
 }
   </style>
 </head>
@@ -905,7 +912,7 @@ ${isWalkCancelled(walk)
 
   <td>
     ${walk.walk_url 
-      ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Open</button>` 
+      ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>`
       : '—'}
   </td>
 
