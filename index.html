@@ -338,6 +338,86 @@ td:first-child {
   min-height: auto !important;
   line-height: 1.2;
 }
+    .action-btn.primary:hover {
+  background: #0845a5;
+}
+
+/* 👇 PASTE #1 CSS HERE */
+.walk-title {
+  font-weight: 700;
+  color: #2b2723;
+  font-size: 15px;
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.walk-leader {
+  font-size: 13px;
+  color: #6f675d;
+  margin-bottom: 8px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.pill-dark {
+  background: #2f2a24;
+  color: #fff;
+}
+
+.pill-soft {
+  background: #e9e1d1;
+  color: #5b534a;
+}
+
+.pill-green {
+  background: #dff2e6;
+  color: #226b3f;
+}
+.pill-red {
+  background: #f8d7da;
+  color: #842029;
+  border: 1px solid #f1aeb5;
+}
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.theme-tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: #e9e1d1;
+  color: #6a5f53;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.walk-meta-stack {
+  display: flex;
+  justify-content: center;
+}
+
+.ended-count {
+  color: #b8aa95;
+  font-weight: 700;
+  margin-left: 6px;
+}
   </style>
 </head>
 <body>
@@ -349,8 +429,8 @@ td:first-child {
 
     <div class="filters" aria-label="Walk filters">
       <div class="field">
-        <label for="searchInput">Search by walk name</label>
-        <input id="searchInput" type="text" placeholder="Type a walk name" />
+        <label for="searchInput">Search by walk name or leader</label>
+        <input id="searchInput" type="text" placeholder="Type a Walk, Neighbourhood, Leader..." />
       </div>
 
       <div class="field">
@@ -520,19 +600,32 @@ function formatTime(value) {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
   }
+  function renderThemeTags(themes) {
+  if (!themes) return '';
 
-  function normalizeWalk(raw) {
-    return {
-      id: String(raw.id ?? ''),
-      walk_name: String(raw.walk_name ?? '').trim(),
-      date: String(raw.date ?? '').trim(),
-      time: String(raw.time ?? '').trim(),
-      neighbourhood: String(raw.neighbourhood ?? '').trim(),
-      walk_url: String(raw.walk_url ?? '').trim(),
-      lat: Number(raw.lat),
-      lng: Number(raw.lng)
-    };
-  }
+  return themes
+    .split(',')
+    .map(tag => tag.trim())
+    .filter(Boolean)
+    .map(tag => `<span class="theme-tag">${escapeHtml(tag)}</span>`)
+    .join('');
+}
+
+function normalizeWalk(raw) {
+  return {
+    id: String(raw.id ?? ''),
+    walk_name: String(raw.walk_name ?? '').trim(),
+    walk_leader: String(raw.walk_leader ?? raw.leader ?? '').trim(),
+    themes: String(raw.themes ?? raw.tags ?? '').trim(),
+    date: String(raw.date ?? '').trim(),
+    time: String(raw.time ?? '').trim(),
+    neighbourhood: String(raw.neighbourhood ?? '').trim(),
+    walk_url: String(raw.walk_url ?? '').trim(),
+    status: String(raw.status ?? '').trim(),
+    lat: Number(raw.lat),
+    lng: Number(raw.lng)
+  };
+}
 
   function isValidWalk(walk) {
     return walk.walk_name && Number.isFinite(walk.lat) && Number.isFinite(walk.lng);
@@ -541,6 +634,82 @@ function getDirectionsUrl(walk) {
   if (!Number.isFinite(walk.lat) || !Number.isFinite(walk.lng)) return '';
   return `https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}`;
 }
+  function getWalkStartDateTime(walk) {
+  const cleanDate = formatDate(walk.date);
+  const timeText = String(walk.time || '').split('&')[0].trim();
+
+  const dateMap = {
+    'May 1': '2026-05-01',
+    'May 2': '2026-05-02',
+    'May 3': '2026-05-03'
+  };
+
+  if (!dateMap[cleanDate]) return null;
+
+  const minutes = getSortTimeValue(timeText);
+  if (minutes === 9999) return null;
+
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+
+  const date = new Date(`${dateMap[cleanDate]}T00:00:00`);
+  date.setHours(hours, mins, 0, 0);
+
+  return date;
+}
+
+function isWalkCancelled(walk) {
+  return String(walk.status || '').toLowerCase() === 'cancelled';
+}
+
+function getWalkDurationMinutes(walk) {
+  const status = String(walk.status || '').trim();
+
+  if (!status) return 90;
+
+  const duration = Number(status);
+
+  if (Number.isFinite(duration) && duration > 0) {
+    return duration;
+  }
+
+  return 90;
+}
+
+function isWalkInProgress(walk) {
+  if (isWalkCancelled(walk)) return false;
+
+  const start = getWalkStartDateTime(walk);
+  if (!start) return false;
+
+  const duration = getWalkDurationMinutes(walk);
+  const end = new Date(start.getTime() + duration * 60 * 1000);
+  const now = new Date();
+
+  return now >= start && now <= end;
+}
+
+function isWalkEnded(walk) {
+  if (isWalkCancelled(walk)) return false;
+
+  const start = getWalkStartDateTime(walk);
+  if (!start) return false;
+
+  const duration = getWalkDurationMinutes(walk);
+  const end = new Date(start.getTime() + duration * 60 * 1000);
+
+  return new Date() > end;
+}
+
+function updateResultCount() {
+  const endedCount = filteredWalks.filter(isWalkEnded).length;
+
+  resultCountEl.innerHTML = `
+    ${filteredWalks.length} walk${filteredWalks.length === 1 ? '' : 's'}
+    <span class="ended-count">• ${endedCount} ended</span>
+  `;
+}
+
 function populateFilterOptions() {
 
   const preferredNeighbourhoods = ['Etobicoke', 'Scarborough', 'North York', 'Downtown'];
@@ -699,25 +868,58 @@ const marker = new google.maps.Marker({
     walks.forEach(walk => {
       const row = document.createElement('tr');
       row.dataset.id = walk.id;
-      row.innerHTML = `
-  <td><button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button></td>
-  <td>${escapeHtml(formatDate(walk.date))}</td>
-  <td>${escapeHtml(formatTime(walk.time))}</td>
-  <td>${escapeHtml(walk.neighbourhood)}</td>
-<td>
-  ${walk.walk_url 
-    ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Open</button>` 
-    : '—'}
-</td>
+row.innerHTML = `
+  <td>
+    <div class="walk-title">${escapeHtml(walk.walk_name)}</div>
+${isWalkCancelled(walk) 
+  ? `<div style="margin-bottom:8px;"><span class="pill pill-red">• Cancelled</span></div>` 
+  : isWalkInProgress(walk)
+    ? `<div style="margin-bottom:8px;"><span class="pill pill-green">• In progress</span></div>` 
+    : ''}
+    ${walk.walk_leader 
+      ? `<div class="walk-leader">Led by ${escapeHtml(walk.walk_leader)}</div>` 
+      : ''}
 
-<td>
-  <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
-    Directions
-  </button>
-</td>
+    ${walk.themes 
+      ? `<div class="tag-list">${renderThemeTags(walk.themes)}</div>` 
+      : ''}
+  </td>
+
+  <td>
+    <div class="walk-meta-stack">
+      <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
+    </div>
+  </td>
+
+  <td>
+    <div class="walk-meta-stack">
+      <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
+    </div>
+  </td>
+
+  <td>
+    <div class="walk-meta-stack">
+      <span class="pill pill-soft">${escapeHtml(walk.neighbourhood)}</span>
+    </div>
+  </td>
+
+  <td>
+    ${walk.walk_url 
+      ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Open</button>` 
+      : '—'}
+  </td>
+
+  <td>
+    <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
+      Directions
+    </button>
+  </td>
 `;
 
-      row.querySelector('.walk-link').addEventListener('click', () => openWalkOnMap(walk.id));
+    row.addEventListener('click', (event) => {
+  if (event.target.closest('button')) return;
+  openWalkOnMap(walk.id);
+});
       tableBody.appendChild(row);
 
       const card = document.createElement('div');
@@ -749,14 +951,21 @@ const marker = new google.maps.Marker({
     const timeValue = timeFilter.value;
 
     filteredWalks = allWalks.filter(walk => {
-      const matchesSearch = !searchValue || walk.walk_name.toLowerCase().includes(searchValue);
+const matchesSearch =
+  !searchValue ||
+  walk.walk_name.toLowerCase().includes(searchValue) ||
+  const matchesSearch =
+  !searchValue ||
+  walk.walk_name.toLowerCase().includes(searchValue) ||
+  (walk.walk_leader || '').toLowerCase().includes(searchValue) ||
+  walk.neighbourhood.toLowerCase().includes(searchValue);
       const matchesDate = !dateValue || formatDate(walk.date) === dateValue;
       const matchesNeighbourhood = !neighbourhoodValue || walk.neighbourhood === neighbourhoodValue;
       const matchesTime = !timeValue || getTimePeriod(walk.time) === timeValue;
       return matchesSearch && matchesDate && matchesTime && matchesNeighbourhood;
     });
 sortWalks(filteredWalks);
-    resultCountEl.textContent = `${filteredWalks.length} walk${filteredWalks.length === 1 ? '' : 's'}`;
+    updateResultCount();
     renderMarkers(filteredWalks);
     renderTable(filteredWalks);
   }
@@ -783,7 +992,7 @@ sortWalks(filteredWalks);
       filteredWalks = [...allWalks];
       renderMarkers(filteredWalks);
       renderTable(filteredWalks);
-      resultCountEl.textContent = `${filteredWalks.length} walk${filteredWalks.length === 1 ? '' : 's'}`;
+      updateResultCount();
       statusEl.textContent = `${allWalks.length} walk${allWalks.length === 1 ? '' : 's'} loaded.`;
     } catch (error) {
       console.error(error);
@@ -848,7 +1057,7 @@ async function loadWeather() {
     filteredWalks = [...allWalks];
     renderMarkers(filteredWalks);
     renderTable(filteredWalks);
-    resultCountEl.textContent = `${filteredWalks.length} walk${filteredWalks.length === 1 ? '' : 's'}`;
+    updateResultCount();
     statusEl.textContent = `${allWalks.length} walk${allWalks.length === 1 ? '' : 's'} loaded.`;
   });
 
