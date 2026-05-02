@@ -1274,19 +1274,29 @@ td:first-child {
   }
 }
 .mobile-feedback-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  min-height: 42px;
-  border-radius: 999px;
-  background: #fffaf2;
-  color: #6f675d;
-  border: 1px solid #d8cdbb;
-  font-weight: 800;
-  font-size: 18px;
-  padding: 0;
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .mobile-search-row {
+    grid-template-columns: 1fr auto auto;
+  }
+
+  .mobile-feedback-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    min-height: 42px;
+    border-radius: 999px;
+    background: #fffaf2;
+    color: #6f675d;
+    border: 1px solid #d8cdbb;
+    font-weight: 800;
+    font-size: 18px;
+    padding: 0;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1482,6 +1492,11 @@ td:first-child {
   justify-content: flex-end;
   gap: 4px;
 }
+    @media (max-width: 640px) {
+  .desktop-feedback-box {
+    display: none;
+  }
+}
   </style>
 </head>
 <body>
@@ -1576,6 +1591,43 @@ td:first-child {
 </div>
 
 <div id="map" aria-label="Map of Jane's Walk locations"></div>
+
+<div class="feedback-box desktop-feedback-box">
+  <h3>Send us feedback, changes, or edits</h3>
+  <p>If you notice anything that should be updated, let us know.</p>
+
+  <form id="desktopFeedbackForm" class="feedback-form">
+    <input
+      type="text"
+      id="desktopFeedbackName"
+      name="name"
+      placeholder="Your name"
+      required
+    />
+
+    <input
+      type="email"
+      id="desktopFeedbackEmail"
+      name="email"
+      placeholder="Your email"
+      required
+    />
+
+    <textarea
+      id="desktopFeedbackMessage"
+      name="message"
+      placeholder="Write your feedback here..."
+      rows="5"
+      required
+    ></textarea>
+
+    <button type="submit" class="action-btn feedback-send-btn">Send</button>
+  </form>
+
+  <div id="desktopFeedbackSuccess" class="feedback-success" style="display:none;">
+    Thank you. Your message has been sent.
+  </div>
+</div>
 
   </aside>
 </div>
@@ -1794,7 +1846,11 @@ function formatTime(value) {
 const tableLoading = document.getElementById('tableLoading');
   const mobileCards = document.getElementById('mobileCards');
   const mobileMapLoading = document.getElementById('mobileMapLoading');
-
+const desktopFeedbackForm = document.getElementById('desktopFeedbackForm');
+const desktopFeedbackName = document.getElementById('desktopFeedbackName');
+const desktopFeedbackEmail = document.getElementById('desktopFeedbackEmail');
+const desktopFeedbackMessage = document.getElementById('desktopFeedbackMessage');
+const desktopFeedbackSuccess = document.getElementById('desktopFeedbackSuccess');
   const searchInput = document.getElementById('searchInput');
   const dateFilter = document.getElementById('dateFilter');
   const timeFilter = document.getElementById('timeFilter');
@@ -2648,6 +2704,33 @@ async function handleFeedbackSubmit(event) {
     console.error(error);
   }
 }
+  async function handleDesktopFeedbackSubmit(event) {
+  event.preventDefault();
+
+  const payload = {
+    name: desktopFeedbackName.value.trim(),
+    email: desktopFeedbackEmail.value.trim(),
+    message: desktopFeedbackMessage.value.trim()
+  };
+
+  try {
+    await fetch(FEEDBACK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify(payload)
+    });
+
+    desktopFeedbackForm.reset();
+    desktopFeedbackSuccess.style.display = 'block';
+
+    setTimeout(() => {
+      desktopFeedbackSuccess.style.display = 'none';
+    }, 4000);
+  } catch (error) {
+    alert('Sorry, your message could not be sent right now.');
+    console.error(error);
+  }
+}
   searchInput.addEventListener('input', applyFilters);
   dateFilter.addEventListener('change', applyFilters);
   timeFilter.addEventListener('change', applyFilters);
@@ -2657,6 +2740,7 @@ async function handleFeedbackSubmit(event) {
   showEndedWalks = !showEndedWalks;
   applyFilters();
 });
+  desktopFeedbackForm.addEventListener('submit', handleDesktopFeedbackSubmit);
   showFavouritesBtn.addEventListener('click', openFavouritesPanel);
   shareFavouritesBtn.addEventListener('click', shareFavouriteWalks);
 closeFavouritesBtn.addEventListener('click', closeFavouritesPanel);
