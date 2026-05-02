@@ -955,6 +955,51 @@ td:first-child {
   color: #222;
   border-color: #d9d9d9;
 }
+    .feedback-box {
+  border: 1px solid #d9d9d9;
+  border-radius: 16px;
+  padding: 16px;
+  background: #fff;
+  margin-top: 16px;
+}
+
+.feedback-box h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.feedback-box p {
+  margin: 0 0 14px;
+  color: #666;
+  font-size: 14px;
+}
+
+.feedback-form {
+  display: grid;
+  gap: 10px;
+}
+
+.feedback-form input,
+.feedback-form textarea {
+  width: 100%;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.feedback-form textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.feedback-success {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #226b3f;
+  font-weight: 700;
+}
   </style>
 </head>
 <body>
@@ -994,7 +1039,7 @@ td:first-child {
 
 <div class="actions actions-with-logo">
   <div class="actions-logo">
-    <img src="https://drive.google.com/file/d/1yZflCYB6VACqpN9Ws5rr6XD9MV5MVMi7/view?usp=drive_link" alt="Jane's Walk logo" />
+    <img src="https://drive.google.com/file/d/1yZflCYB6VACqpN9Ws5rr6XD9MV5MVMi7/view?usp=sharing" alt="Jane's Walk logo" />
   </div>
   <button id="resetBtn" type="button">Reset filters</button>
   <button id="showAllBtn" class="primary" type="button">Show all pins</button>
@@ -1032,13 +1077,41 @@ td:first-child {
   <div id="weatherCards" class="weather-cards"></div>
 </div>
 
-    <div id="map" aria-label="Map of Jane's Walk locations"></div>
     <div class="feedback-box">
   <h3>Send us feedback, changes, or edits</h3>
   <p>If you notice anything that should be updated, let us know.</p>
-  <a href="mailto:support@janeswalk.net?subject=Jane's Walk 2026 feedback" class="feedback-link">
-    Email us
-  </a>
+
+  <form id="feedbackForm" class="feedback-form">
+    <input
+      type="text"
+      id="feedbackName"
+      name="name"
+      placeholder="Your name"
+      required
+    />
+
+    <input
+      type="email"
+      id="feedbackEmail"
+      name="email"
+      placeholder="Your email"
+      required
+    />
+
+    <textarea
+      id="feedbackMessage"
+      name="message"
+      placeholder="Write your feedback here..."
+      rows="5"
+      required
+    ></textarea>
+
+    <button type="submit" class="action-btn primary">Send</button>
+  </form>
+
+  <div id="feedbackSuccess" class="feedback-success" style="display:none;">
+    Thank you. Your message has been sent.
+  </div>
 </div>
   </aside>
 </div>
@@ -1171,6 +1244,11 @@ const favouritesPanel = document.getElementById('favouritesPanel');
 const favouritesBackdrop = document.getElementById('favouritesBackdrop');
 const favouritesList = document.getElementById('favouritesList');
 
+const feedbackForm = document.getElementById('feedbackForm');
+const feedbackName = document.getElementById('feedbackName');
+const feedbackEmail = document.getElementById('feedbackEmail');
+const feedbackMessage = document.getElementById('feedbackMessage');
+const feedbackSuccess = document.getElementById('feedbackSuccess');  
   function escapeHtml(value) {
     return String(value ?? '')
       .replace(/&/g, '&amp;')
@@ -1821,7 +1899,42 @@ async function loadWeather() {
     await loadWalks();
     await loadWeather();
   }
+const FEEDBACK_URL = 'YOUR_FEEDBACK_APPS_SCRIPT_URL_HERE';
 
+async function handleFeedbackSubmit(event) {
+  event.preventDefault();
+
+  const payload = {
+    name: feedbackName.value.trim(),
+    email: feedbackEmail.value.trim(),
+    message: feedbackMessage.value.trim(),
+    submitted_at: new Date().toISOString()
+  };
+
+  try {
+    const response = await fetch(FEEDBACK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to send feedback');
+    }
+
+    feedbackForm.reset();
+    feedbackSuccess.style.display = 'block';
+
+    setTimeout(() => {
+      feedbackSuccess.style.display = 'none';
+    }, 4000);
+  } catch (error) {
+    alert('Sorry, your message could not be sent right now.');
+    console.error(error);
+  }
+}
   searchInput.addEventListener('input', applyFilters);
   dateFilter.addEventListener('change', applyFilters);
   timeFilter.addEventListener('change', applyFilters);
@@ -1842,7 +1955,7 @@ showAllBtn.addEventListener('click', () => {
   timeFilter.value = '';
   applyFilters();
 });
-
+feedbackForm.addEventListener('submit', handleFeedbackSubmit);
   window.initMap = initMap;
 </script>
 
