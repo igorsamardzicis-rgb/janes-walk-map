@@ -1459,11 +1459,12 @@ function renderFavouritesPanel() {
         <div class="walk-row-card">
           <div class="walk-row-top">
             <div class="walk-row-main">
-              <div class="walk-pill-row">
-                <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
-                <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
-                <span class="pill pill-dark">${escapeHtml(walk.neighbourhood || '—')}</span>
-              </div>
+<div class="walk-pill-row">
+  <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
+  <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
+  <span class="pill pill-dark">${escapeHtml(walk.neighbourhood || '—')}</span>
+  ${getStatusPillHtml(walk)}
+</div>
 
               <div class="walk-title-row">
                 <div class="walk-row-main">
@@ -1524,12 +1525,11 @@ function renderFavouritesPanel() {
 
       <div class="walk-title-row">
         <div class="walk-row-main">
-          <div class="walk-title-main">
-            <h3 style="margin:0;">
-              <button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button>
-            </h3>
-            ${getStatusPillHtml(walk)}
-          </div>
+<div class="walk-title-main">
+  <h3 style="margin:0;">
+    <button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button>
+  </h3>
+</div>
 
           ${walk.walk_leader 
             ? `<div class="walk-leader">Led by ${escapeHtml(walk.walk_leader)}</div>` 
