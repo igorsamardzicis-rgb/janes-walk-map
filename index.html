@@ -1009,6 +1009,7 @@ td:first-child {
 }
 #showFavouritesBtn {
   position: relative;
+  overflow: visible;
   background: #f3f3f3;
   color: #9a9a9a;
   border-color: #dddddd;
@@ -1031,19 +1032,22 @@ td:first-child {
 #showFavouritesBtn.has-count::after {
   content: attr(data-count);
   position: absolute;
-  top: -9px;
-  right: -9px;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 5px;
-  border-radius: 999px;
-  background: #2f2a24;
-  color: #fff;
+  top: -11px;
+  right: -11px;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  padding: 0;
+  border-radius: 50%;
+  background: #fffaf2;
+  color: #2f2a24;
+  border: 1px solid #d8cdbb;
   font-size: 11px;
   font-weight: 700;
   line-height: 20px;
   text-align: center;
-  border: 2px solid #fff;
+  box-sizing: border-box;
+  z-index: 5;
 }
     #showAllBtn {
   background: #f3f3f3;
