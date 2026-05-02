@@ -1902,7 +1902,7 @@ async function loadWeather() {
     await loadWalks();
     await loadWeather();
   }
-const FEEDBACK_URL = 'YOUR_FEEDBACK_APPS_SCRIPT_URL_HERE';
+const FEEDBACK_URL = 'https://script.google.com/macros/s/AKfycbx86vOXBeqBFW_JXp5exwlTT2tSCvzcNSTI7GVCe0mGHKj2aICV-ypvru49SOam8VgzFw/exec';
 
 async function handleFeedbackSubmit(event) {
   event.preventDefault();
@@ -1910,22 +1910,15 @@ async function handleFeedbackSubmit(event) {
   const payload = {
     name: feedbackName.value.trim(),
     email: feedbackEmail.value.trim(),
-    message: feedbackMessage.value.trim(),
-    submitted_at: new Date().toISOString()
+    message: feedbackMessage.value.trim()
   };
 
   try {
-    const response = await fetch(FEEDBACK_URL, {
+    await fetch(FEEDBACK_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      mode: 'no-cors',
       body: JSON.stringify(payload)
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to send feedback');
-    }
 
     feedbackForm.reset();
     feedbackSuccess.style.display = 'block';
