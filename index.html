@@ -863,9 +863,9 @@ td:first-child {
 }
 
 .favourite-btn.active {
-  border-color: #d85a3a;
-  background: #d85a3a;
-  color: #1f2b36;
+  border-color: #E8913D;
+  background: #E8913D;
+  color: #ffffff;
 }
     .walk-row-actions .action-btn,
 .walk-row-actions .favourite-btn {
@@ -1039,9 +1039,9 @@ td:first-child {
   min-width: 22px;
   padding: 0;
   border-radius: 50%;
-  background: #d85a3a;
-  color: #1f2b36;
-  border: 1px solid #d85a3a;
+  background: #E8913D;
+  color: #ffffff; /* number */
+  border: 1px solid #E8913D;
   font-size: 11px;
   font-weight: 700;
   line-height: 20px;
@@ -1221,7 +1221,7 @@ let activeRowId = null;
 let showEndedWalks = false;  
 let favouriteWalkIds = JSON.parse(localStorage.getItem('favouriteWalkIds') || '[]');  
   const DEFAULT_MARKER_BLUE = '#3f78a8';
-const FAVOURITE_MARKER_ORANGE = '#d85a3a';
+const FAVOURITE_MARKER_ORANGE = '#E8913D';
 
 function getSortDateValue(value) {
   const cleanDate = formatDate(value);
