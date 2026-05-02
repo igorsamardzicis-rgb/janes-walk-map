@@ -1046,7 +1046,7 @@ const linkHtml = walk.walk_url
   }
 
   function openWalkOnMap(walkId) {
-    const walk = filteredWalks.find(w => w.id === walkId) || allWalks.find(w => w.id === walkId);
+    const walk = filteredWalks.find(w => getWalkId(w) === walkId) || allWalks.find(w => getWalkId(w) === walkId);
     if (!walk) return;
 
     const markerEntry = markers.find(m => m.walkId === walkId);
@@ -1085,10 +1085,10 @@ const marker = new google.maps.Marker({
       marker.addListener('click', () => {
         infoWindow.setContent(getInfoContent(walk));
         infoWindow.open({ map, anchor: marker });
-        highlightRow(walk.id);
+       highlightRow(getWalkId(walk));
       });
 
-      markers.push({ walkId: walk.id, marker });
+      markers.push({ walkId: getWalkId(walk), marker });
     });
 
     if (walks.length) {
@@ -1149,116 +1149,134 @@ function renderFavouritesPanel() {
     </div>
   `).join('');
 }
-  function renderTable(walks) {
-    tableBody.innerHTML = '';
-    mobileCards.innerHTML = '';
+ function renderTable(walks) {
+  tableBody.innerHTML = '';
+  mobileCards.innerHTML = '';
 
-    if (!walks.length) {
-      emptyTable.style.display = 'block';
-      return;
-    }
-
-    emptyTable.style.display = 'none';
-
-    walks.forEach(walk => {
-      const row = document.createElement('tr');
-      row.dataset.id = walk.id;
-<td>
-  <div class="walk-title-row">
-    <div class="walk-title-main">
-      <div class="walk-title">${escapeHtml(walk.walk_name)}</div>
-      ${getStatusPillHtml(walk)}
-    </div>
-
-    <button 
-      class="favourite-btn ${isFavourite(walk.id) ? 'active' : ''}" 
-      type="button" 
-      aria-label="Favourite ${escapeHtml(walk.walk_name)}"
-      onclick="toggleFavourite('${escapeHtml(walk.id)}')">
-      ${isFavourite(walk.id) ? '★' : '☆'}
-    </button>
-  </div>
-
-    ${walk.themes 
-      ? `<div class="tag-list">${renderThemeTags(walk.themes)}</div>` 
-      : ''}
-  </td>
-
-  <td>
-    <div class="walk-meta-stack">
-      <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
-    </div>
-  </td>
-
-  <td>
-    <div class="walk-meta-stack">
-      <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
-    </div>
-  </td>
-
-  <td>
-    <div class="walk-meta-stack">
-      <span class="pill pill-soft">${escapeHtml(walk.neighbourhood)}</span>
-    </div>
-  </td>
-
-  <td>
-    ${walk.walk_url 
-      ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>`
-      : '—'}
-  </td>
-
-  <td>
-    <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
-      Directions
-    </button>
-  </td>
-`;
-
-    row.addEventListener('click', (event) => {
-  if (event.target.closest('button')) return;
-  openWalkOnMap(walk.id);
-});
-      tableBody.appendChild(row);
-
-      const card = document.createElement('div');
-      card.className = 'card';
-  card.innerHTML = `
-  <div class="walk-title-row">
-    <div class="walk-title-main">
-      <h3 style="margin:0;">
-        <button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button>
-      </h3>
-      ${getStatusPillHtml(walk)}
-    </div>
-
-    <button 
-      class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
-      type="button"
-      onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
-      ${isFavourite(walk) ? '★' : '☆'}
-    </button>
-  </div>
-
-  <p><strong>Date:</strong> ${escapeHtml(formatDate(walk.date) || '—')}</p>
-  <p><strong>Time:</strong> ${escapeHtml(formatTime(walk.time) || '—')}</p>
-  <p><strong>Neighbourhood:</strong> ${escapeHtml(walk.neighbourhood || '—')}</p>
-
-  <div class="mobile-actions">
-    ${walk.walk_url 
-      ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
-      : ''}
-
-    <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
-      Directions
-    </button>
-  </div>
-`;
-      card.querySelector('.walk-link').addEventListener('click', () => openWalkOnMap(walk.id));
-      mobileCards.appendChild(card);
-    });
+  if (!walks.length) {
+    emptyTable.style.display = 'block';
+    return;
   }
 
+  emptyTable.style.display = 'none';
+
+  walks.forEach(walk => {
+    const row = document.createElement('tr');
+    row.dataset.id = getWalkId(walk);
+
+    row.innerHTML = `
+      <td>
+        <div class="walk-title-row">
+          <div>
+            <div class="walk-title-main">
+              <div class="walk-title">${escapeHtml(walk.walk_name)}</div>
+              ${getStatusPillHtml(walk)}
+            </div>
+
+            ${walk.walk_leader 
+              ? `<div class="walk-leader">Led by ${escapeHtml(walk.walk_leader)}</div>` 
+              : ''}
+
+            ${walk.themes 
+              ? `<div class="tag-list">${renderThemeTags(walk.themes)}</div>` 
+              : ''}
+          </div>
+
+          <button 
+            class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
+            type="button" 
+            aria-label="Favourite ${escapeHtml(walk.walk_name)}"
+            onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
+            ${isFavourite(walk) ? '★' : '☆'}
+          </button>
+        </div>
+      </td>
+
+      <td>
+        <div class="walk-meta-stack">
+          <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
+        </div>
+      </td>
+
+      <td>
+        <div class="walk-meta-stack">
+          <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
+        </div>
+      </td>
+
+      <td>
+        <div class="walk-meta-stack">
+          <span class="pill pill-soft">${escapeHtml(walk.neighbourhood)}</span>
+        </div>
+      </td>
+
+      <td>
+        ${walk.walk_url 
+          ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
+          : '—'}
+      </td>
+
+      <td>
+        <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
+          Directions
+        </button>
+      </td>
+    `;
+
+    row.addEventListener('click', (event) => {
+      if (event.target.closest('button')) return;
+      openWalkOnMap(getWalkId(walk));
+    });
+
+    tableBody.appendChild(row);
+
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    card.innerHTML = `
+      <div class="walk-title-row">
+        <div class="walk-title-main">
+          <h3 style="margin:0;">
+            <button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button>
+          </h3>
+          ${getStatusPillHtml(walk)}
+        </div>
+
+        <button 
+          class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
+          type="button"
+          onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
+          ${isFavourite(walk) ? '★' : '☆'}
+        </button>
+      </div>
+
+      ${walk.walk_leader 
+        ? `<p><strong>Led by:</strong> ${escapeHtml(walk.walk_leader)}</p>` 
+        : ''}
+
+      <p><strong>Date:</strong> ${escapeHtml(formatDate(walk.date) || '—')}</p>
+      <p><strong>Time:</strong> ${escapeHtml(formatTime(walk.time) || '—')}</p>
+      <p><strong>Neighbourhood:</strong> ${escapeHtml(walk.neighbourhood || '—')}</p>
+
+      ${walk.themes 
+        ? `<div class="tag-list">${renderThemeTags(walk.themes)}</div>` 
+        : ''}
+
+      <div class="mobile-actions">
+        ${walk.walk_url 
+          ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
+          : ''}
+
+        <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
+          Directions
+        </button>
+      </div>
+    `;
+
+    card.querySelector('.walk-link').addEventListener('click', () => openWalkOnMap(getWalkId(walk)));
+    mobileCards.appendChild(card);
+  });
+}
 function applyFilters() {
   const searchValue = searchInput.value.trim().toLowerCase();
   const dateValue = dateFilter.value;
