@@ -790,14 +790,20 @@ function getDirectionsUrl(walk) {
   if (!Number.isFinite(walk.lat) || !Number.isFinite(walk.lng)) return '';
   return `https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}`;
 }
-  function isFavourite(walkId) {
-  return favouriteWalkIds.includes(String(walkId));
+  function getWalkId(walk) {
+  return String(
+    walk.id ||
+    `${walk.walk_name}-${walk.date}-${walk.time}-${walk.neighbourhood}`
+  );
+}
+function isFavourite(walk) {
+  return favouriteWalkIds.includes(getWalkId(walk));
 }
 
 function toggleFavourite(walkId) {
   walkId = String(walkId);
 
-  if (isFavourite(walkId)) {
+  if (favouriteWalkIds.includes(walkId)) {
     favouriteWalkIds = favouriteWalkIds.filter(id => id !== walkId);
   } else {
     favouriteWalkIds.push(walkId);
@@ -1062,7 +1068,7 @@ function closeFavouritesPanel() {
 
 function renderFavouritesPanel() {
   const favouriteWalks = allWalks
-    .filter(walk => isFavourite(walk.id))
+    .filter(walk => isFavourite(walk))
     .sort((a, b) => {
       const dateDiff = getSortDateValue(a.date) - getSortDateValue(b.date);
       if (dateDiff !== 0) return dateDiff;
@@ -1091,9 +1097,9 @@ function renderFavouritesPanel() {
         </button>
       </div>
 
-      <button class="action-btn" style="margin-top:8px; width:100%;" onclick="toggleFavourite('${escapeHtml(walk.id)}')">
-        Remove from favourites
-      </button>
+<button class="action-btn" style="margin-top:8px; width:100%;" onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
+  Remove from favourites
+</button>
     </div>
   `).join('');
 }
@@ -1115,13 +1121,13 @@ row.innerHTML = `
   <td>
     <div class="walk-title-row">
   <div class="walk-title">${escapeHtml(walk.walk_name)}</div>
-  <button 
-    class="favourite-btn ${isFavourite(walk.id) ? 'active' : ''}" 
-    type="button" 
-    aria-label="Favourite ${escapeHtml(walk.walk_name)}"
-    onclick="toggleFavourite('${escapeHtml(walk.id)}')">
-    ☆
-  </button>
+<button 
+  class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
+  type="button" 
+  aria-label="Favourite ${escapeHtml(walk.walk_name)}"
+  onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
+  ${isFavourite(walk) ? '★' : '☆'}
+</button>
 </div>
 ${isWalkCancelled(walk) 
   ? `<div style="margin-bottom:8px;"><span class="pill pill-red">Cancelled</span></div>` 
@@ -1182,10 +1188,10 @@ ${isWalkCancelled(walk)
         <div class="walk-title-row">
   <h3><button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button></h3>
   <button 
-    class="favourite-btn ${isFavourite(walk.id) ? 'active' : ''}" 
+    class="favourite-btn $isFavourite(walk) ? 'active' : ''}" 
     type="button"
-    onclick="toggleFavourite('${escapeHtml(walk.id)}')">
-    ${isFavourite(walk.id) ? '★' : '☆'}
+    onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
+    $isFavourite(walk) ? '★' : '☆'}
   </button>
 </div>
         <p><strong>Date:</strong> ${escapeHtml(formatDate(walk.date) || '—')}</p>
