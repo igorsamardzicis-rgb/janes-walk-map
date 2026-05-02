@@ -553,6 +553,38 @@ td:first-child {
 .favourite-actions .action-btn {
   flex: 1;
 }
+    .walk-title-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.title-status-pill {
+  margin: 0;
+}
+
+.pill-progress {
+  background: #dff2e6;
+  color: #226b3f;
+  animation: pulseGreen 1.4s ease-in-out infinite;
+}
+
+@keyframes pulseGreen {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 107, 63, 0.35);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 6px rgba(34, 107, 63, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 107, 63, 0);
+  }
+}
   </style>
 </head>
 <body>
@@ -605,7 +637,7 @@ td:first-child {
   <div>Tip: tap a walk name below to open it on the map.</div>
 </div>
 <div id="weatherBox" class="weather-box">
-  <div id="weatherStatus">Loading weather...</div>
+  <div id="weatherStatus">Loading walks, please wait...</div>
   <div id="weatherCards" class="weather-cards"></div>
 </div>
     <div id="map" aria-label="Map of Jane's Walk locations"></div>
@@ -766,7 +798,21 @@ const favouritesList = document.getElementById('favouritesList');
     .map(tag => `<span class="theme-tag">${escapeHtml(tag)}</span>`)
     .join('');
 }
+function getStatusPillHtml(walk) {
+  if (isWalkCancelled(walk)) {
+    return `<span class="pill pill-red title-status-pill">Cancelled</span>`;
+  }
 
+  if (isWalkInProgress(walk)) {
+    return `<span class="pill pill-progress title-status-pill">In progress</span>`;
+  }
+
+  if (isWalkEnded(walk)) {
+    return `<span class="pill pill-ended title-status-pill">Ended</span>`;
+  }
+
+  return '';
+}
 function normalizeWalk(raw) {
   return {
     id: String(raw.id ?? ''),
@@ -1117,28 +1163,21 @@ function renderFavouritesPanel() {
     walks.forEach(walk => {
       const row = document.createElement('tr');
       row.dataset.id = walk.id;
-row.innerHTML = `
-  <td>
-    <div class="walk-title-row">
-  <div class="walk-title">${escapeHtml(walk.walk_name)}</div>
-<button 
-  class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
-  type="button" 
-  aria-label="Favourite ${escapeHtml(walk.walk_name)}"
-  onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
-  ${isFavourite(walk) ? '★' : '☆'}
-</button>
-</div>
-${isWalkCancelled(walk) 
-  ? `<div style="margin-bottom:8px;"><span class="pill pill-red">Cancelled</span></div>` 
-  : isWalkInProgress(walk)
-    ? `<div style="margin-bottom:8px;"><span class="pill pill-green">In progress</span></div>` 
-    : isWalkEnded(walk)
-      ? `<div style="margin-bottom:8px;"><span class="pill pill-ended">Ended</span></div>` 
-      : ''}
-    ${walk.walk_leader 
-      ? `<div class="walk-leader">Led by ${escapeHtml(walk.walk_leader)}</div>` 
-      : ''}
+<td>
+  <div class="walk-title-row">
+    <div class="walk-title-main">
+      <div class="walk-title">${escapeHtml(walk.walk_name)}</div>
+      ${getStatusPillHtml(walk)}
+    </div>
+
+    <button 
+      class="favourite-btn ${isFavourite(walk.id) ? 'active' : ''}" 
+      type="button" 
+      aria-label="Favourite ${escapeHtml(walk.walk_name)}"
+      onclick="toggleFavourite('${escapeHtml(walk.id)}')">
+      ${isFavourite(walk.id) ? '★' : '☆'}
+    </button>
+  </div>
 
     ${walk.themes 
       ? `<div class="tag-list">${renderThemeTags(walk.themes)}</div>` 
@@ -1184,29 +1223,37 @@ ${isWalkCancelled(walk)
 
       const card = document.createElement('div');
       card.className = 'card';
-      card.innerHTML = `
-        <div class="walk-title-row">
-  <h3><button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button></h3>
-  <button 
-    class="favourite-btn $isFavourite(walk) ? 'active' : ''}" 
-    type="button"
-    onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
-    $isFavourite(walk) ? '★' : '☆'}
-  </button>
-</div>
-        <p><strong>Date:</strong> ${escapeHtml(formatDate(walk.date) || '—')}</p>
-        <p><strong>Time:</strong> ${escapeHtml(formatTime(walk.time) || '—')}</p>
-        <p><strong>Neighbourhood:</strong> ${escapeHtml(walk.neighbourhood || '—')}</p>
-       <div class="mobile-actions">
-  ${walk.walk_url 
-    ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
-    : ''}
+  card.innerHTML = `
+  <div class="walk-title-row">
+    <div class="walk-title-main">
+      <h3 style="margin:0;">
+        <button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button>
+      </h3>
+      ${getStatusPillHtml(walk)}
+    </div>
 
-  <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
-    Directions
-  </button>
-</div>
-      `;
+    <button 
+      class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
+      type="button"
+      onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
+      ${isFavourite(walk) ? '★' : '☆'}
+    </button>
+  </div>
+
+  <p><strong>Date:</strong> ${escapeHtml(formatDate(walk.date) || '—')}</p>
+  <p><strong>Time:</strong> ${escapeHtml(formatTime(walk.time) || '—')}</p>
+  <p><strong>Neighbourhood:</strong> ${escapeHtml(walk.neighbourhood || '—')}</p>
+
+  <div class="mobile-actions">
+    ${walk.walk_url 
+      ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
+      : ''}
+
+    <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
+      Directions
+    </button>
+  </div>
+`;
       card.querySelector('.walk-link').addEventListener('click', () => openWalkOnMap(walk.id));
       mobileCards.appendChild(card);
     });
@@ -1250,6 +1297,7 @@ function applyFilters() {
 
   async function loadWalks() {
     statusEl.textContent = 'Loading walks...';
+    document.getElementById('weatherStatus').textContent = 'Loading walks, please wait...';
 
     try {
       const response = await fetch(DATA_URL, { cache: 'no-store' });
