@@ -459,7 +459,7 @@ td:first-child {
     <h1>Jane's Walk Map</h1>
     <p class="intro">Browse walks on the map or use the filters below. Click a walk name in the list to zoom to its pin on the map.</p>
 
-    <div id="status" class="status">Loading walks...</div>
+    <div id="status" class="status" style="display:none;"></div>
 
     <div class="filters" aria-label="Walk filters">
       <div class="field">
@@ -1053,15 +1053,14 @@ function applyFilters() {
       allWalks = sortWalks(raw.map(normalizeWalk).filter(isValidWalk));
 
       populateFilterOptions();
-      filteredWalks = [...allWalks];
-      renderMarkers(filteredWalks);
-      renderTable(filteredWalks);
-      updateResultCount();
-      statusEl.textContent = `${allWalks.length} walk${allWalks.length === 1 ? '' : 's'} loaded.`;
-    } catch (error) {
-      console.error(error);
-      statusEl.textContent = 'Could not load walk data. Check your Apps Script URL and sharing settings.';
-    }
+applyFilters();
+statusEl.textContent = '';
+statusEl.style.display = 'none';
+} catch (error) {
+  console.error(error);
+  statusEl.style.display = 'block';
+  statusEl.textContent = 'Could not load walk data. Check your Apps Script URL and sharing settings.';
+}
   }
 async function loadWeather() {
   const weatherStatus = document.getElementById('weatherStatus');
@@ -1127,7 +1126,6 @@ showAllBtn.addEventListener('click', () => {
   neighbourhoodFilter.value = '';
   timeFilter.value = '';
   applyFilters();
-  statusEl.textContent = `${allWalks.length} walk${allWalks.length === 1 ? '' : 's'} loaded.`;
 });
 
   window.initMap = initMap;
