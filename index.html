@@ -462,30 +462,27 @@ td:first-child {
   border: 1px solid #d8cdbb;
 }
 .favourite-btn {
-  border: 1px solid #d8cdbb;
-  background: #fffaf2;
-  color: #b8aa95;
+  border: 1px solid #8fc7ea;
+  background: #fff;
+  color: #8fc7ea;
   border-radius: 999px;
   width: 42px;
   height: 42px;
   min-width: 42px;
   min-height: 42px;
   flex: 0 0 42px;
-  flex-shrink: 0;
-  aspect-ratio: 1 / 1;
   padding: 0;
   font-size: 22px;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  align-self: flex-start;
 }
 
 .favourite-btn.active {
-  background: #f4efe6;
-  color: #d85a3a;
-  border-color: #d85a3a;
+  border-color: #8fc7ea;
+  background: #eaf5fc;
+  color: #8fc7ea;
 }
 
 .walk-title-row {
@@ -675,7 +672,7 @@ td:first-child {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 
 .walk-title-row {
@@ -730,8 +727,7 @@ td:first-child {
 
 .title-status-pill {
   margin: 0;
-  position: relative;
-  top: -1px;
+  position: static;
 }
 
 /* ===== BUTTONS ON RIGHT SIDE OF EACH WALK ===== */
@@ -877,6 +873,10 @@ td:first-child {
   #map {
     height: 420px;
   }
+}
+
+    #showAllBtn {
+  color: #1f2b36;
 }
   </style>
 </head>
@@ -1467,10 +1467,9 @@ function renderFavouritesPanel() {
 
               <div class="walk-title-row">
                 <div class="walk-row-main">
-                  <div class="walk-title-main">
-                    <div class="walk-title">${escapeHtml(walk.walk_name)}</div>
-                    ${getStatusPillHtml(walk)}
-                  </div>
+<div class="walk-title-main">
+  <div class="walk-title">${escapeHtml(walk.walk_name)}</div>
+</div>
 
                   ${walk.walk_leader 
                     ? `<div class="walk-leader">Led by ${escapeHtml(walk.walk_leader)}</div>` 
@@ -1516,11 +1515,12 @@ function renderFavouritesPanel() {
     card.className = 'card';
 
     card.innerHTML = `
-      <div class="walk-pill-row">
-        <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
-        <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
-        <span class="pill pill-dark">${escapeHtml(walk.neighbourhood || '—')}</span>
-      </div>
+<div class="walk-pill-row">
+  <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
+  <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
+  <span class="pill pill-dark">${escapeHtml(walk.neighbourhood || '—')}</span>
+  ${getStatusPillHtml(walk)}
+</div>
 
       <div class="walk-title-row">
         <div class="walk-row-main">
