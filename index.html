@@ -1188,6 +1188,25 @@ td:first-child {
     margin-top: 0;
   }
 }
+    @media (max-width: 640px) {
+  .weather-box {
+    display: none;
+  }
+}
+    @media (max-width: 640px) {
+  .mobile-card-weather {
+    position: absolute;
+    top: 66px;
+    right: 18px;
+    display: grid;
+    gap: 2px;
+    text-align: right;
+    font-size: 12px;
+    font-weight: 700;
+    color: #6f675d;
+    line-height: 1.2;
+  }
+}
   </style>
 </head>
 <body>
@@ -1211,10 +1230,11 @@ td:first-child {
 <div class="field search-field">
   <label for="searchInput">Search by walk name or leader</label>
 
-  <div class="mobile-search-row">
-    <input id="searchInput" type="text" placeholder="Type a Walk, Neighbourhood, Leader..." />
-    <button id="mobileFilterBtn" class="mobile-filter-btn" type="button">Filter</button>
-  </div>
+<div class="mobile-search-row">
+  <input id="searchInput" type="text" placeholder="Type a Walk, Neighbourhood, Leader..." />
+  <button id="mobileFilterBtn" class="mobile-filter-btn" type="button">Filter</button>
+  <button id="mobileFeedbackBtn" class="mobile-feedback-btn" type="button" aria-label="Send feedback">?</button>
+</div>
 </div>
 
       <div class="field advanced-filter">
@@ -1276,46 +1296,60 @@ td:first-child {
   <div id="weatherCards" class="weather-cards"></div>
 </div>
 <div id="map" aria-label="Map of Jane's Walk locations"></div>
-    <div class="feedback-box">
-  <h3>Send us feedback, changes, or edits</h3>
-  <p>If you notice anything that should be updated, let us know.</p>
 
-  <form id="feedbackForm" class="feedback-form">
-    <input
-      type="text"
-      id="feedbackName"
-      name="name"
-      placeholder="Your name"
-      required
-    />
-
-    <input
-      type="email"
-      id="feedbackEmail"
-      name="email"
-      placeholder="Your email"
-      required
-    />
-
-    <textarea
-      id="feedbackMessage"
-      name="message"
-      placeholder="Write your feedback here..."
-      rows="5"
-      required
-    ></textarea>
-
-    <button type="submit" class="action-btn feedback-send-btn">Send</button>
-  </form>
-
-  <div id="feedbackSuccess" class="feedback-success" style="display:none;">
-    Thank you. Your message has been sent.
-  </div>
-</div>
   </aside>
 </div>
   </div>
      </div>
+  <div id="feedbackBackdrop" class="favourites-backdrop"></div>
+
+<aside id="feedbackPanel" class="favourites-panel" aria-label="Send feedback">
+  <div class="favourites-header">
+    <h2>Send Feedback</h2>
+    <button id="closeFeedbackBtn" class="action-btn" type="button">Close</button>
+  </div>
+
+  <div class="feedback-box">
+    <h3>Send us feedback, changes, or edits</h3>
+    <p>If you notice anything that should be updated, let us know.</p>
+
+    <form id="feedbackForm" class="feedback-form">
+      <input
+        type="text"
+        id="feedbackName"
+        name="name"
+        placeholder="Your name"
+        required
+      />
+
+      <input
+        type="email"
+        id="feedbackEmail"
+        name="email"
+        placeholder="Your email"
+        required
+      />
+
+      <textarea
+        id="feedbackMessage"
+        name="message"
+        placeholder="Write your feedback here..."
+        rows="5"
+        required
+      ></textarea>
+
+      <button type="submit" class="action-btn feedback-send-btn">Send</button>
+    </form>
+
+    <div id="feedbackSuccess" class="feedback-success" style="display:none;">
+      Thank you. Your message has been sent.
+    </div>
+  </div>
+</aside>
+
+<div id="favouritesBackdrop" class="favourites-backdrop"></div>
+
+<aside id="favouritesPanel" class="favourites-panel" aria-label="Favourite walks">
 <div id="favouritesBackdrop" class="favourites-backdrop"></div>
 
 <aside id="favouritesPanel" class="favourites-panel" aria-label="Favourite walks">
@@ -1416,6 +1450,26 @@ function formatTime(value) {
     hour: 'numeric',
     minute: '2-digit'
   });
+}
+  function getMobileWeatherHtml(walk) {
+  const date = formatDate(walk.date);
+
+  const weatherByDate = {
+    'May 1': { temp: '8°', rain: '15%' },
+    'May 2': { temp: '9°', rain: '60%' },
+    'May 3': { temp: '12°', rain: '60%' }
+  };
+
+  const weather = weatherByDate[date];
+
+  if (!weather) return '';
+
+  return `
+    <div class="mobile-card-weather">
+      <span>${weather.temp}</span>
+      <span>☔ ${weather.rain}</span>
+    </div>
+  `;
 }
   function getTimePeriod(value) {
   const minutes = getSortTimeValue(value);
@@ -1987,6 +2041,7 @@ function renderTable(walks) {
           onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
           ${isFavourite(walk) ? '★' : '☆'}
         </button>
+        ${getMobileWeatherHtml(walk)}
       </div>
 
       <div class="mobile-actions">
