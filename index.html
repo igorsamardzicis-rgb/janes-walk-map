@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jane's Walk Map</title>
+  <title>Jane's Walk 2026</title>
   <style>
    /* Better table alignment */
 th,
@@ -843,10 +843,10 @@ td:first-child {
   color: #2b2723;
   padding: 40px 20px;
 }
-    .favourite-btn {
-  border: 1.5px solid #8fc7ea !important;
-  background: #fff !important;
-  color: #8fc7ea !important;
+  .favourite-btn {
+  border: 1.5px solid #c9c2b5;
+  background: #fff;
+  color: #c9c2b5;
   border-radius: 999px;
   width: 42px;
   height: 42px;
@@ -863,19 +863,91 @@ td:first-child {
 }
 
 .favourite-btn.active {
-  border-color: #8fc7ea !important;
-  background: #8fc7ea !important;
-  color: #1f2b36 !important;
+  border-color: #8fc7ea;
+  background: #8fc7ea;
+  color: #1f2b36;
 }
     .walk-row-actions .action-btn,
 .walk-row-actions .favourite-btn {
   min-height: 42px;
 }
+    .actions-with-logo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-items: end;
+}
+
+.actions-logo {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 4px;
+}
+
+.actions-logo img {
+  max-height: 36px;
+  width: auto;
+  display: block;
+}
+    .feedback-box {
+  margin-top: 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 14px;
+  padding: 14px;
+  background: #fff;
+}
+
+.feedback-box h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.feedback-box p {
+  margin: 0 0 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+.feedback-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #8fc7ea;
+  color: #1f2b36;
+  text-decoration: none;
+  font-weight: 700;
+}
+    .favourites-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (min-width: 769px) {
+  .share-btn.mobile-only {
+    display: none;
+  }
+}
+    .table-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #2b2723;
+  text-align: center;
+  padding: 24px;
+}
   </style>
 </head>
 <body>
   <div class="page">
-    <h1>Jane's Walk Map</h1>
+    <h1>Jane's Walk 2026</h1>
     <p class="intro">Browse walks on the map or use the filters below. Click a walk name in the list to zoom to its pin on the map.</p>
 
     <div id="status" class="status" style="display:none;"></div>
@@ -908,10 +980,13 @@ td:first-child {
         </select>
       </div>
 
-      <div class="actions">
-        <button id="resetBtn" type="button">Reset filters</button>
-        <button id="showAllBtn" class="primary" type="button">Show all pins</button>
-      </div>
+<div class="actions actions-with-logo">
+  <div class="actions-logo">
+    <img src="https://drive.google.com/file/d/1yZflCYB6VACqpN9Ws5rr6XD9MV5MVMi7/view?usp=drive_link" alt="Jane's Walk logo" />
+  </div>
+  <button id="resetBtn" type="button">Reset filters</button>
+  <button id="showAllBtn" class="primary" type="button">Show all pins</button>
+</div>
     </div>
 
 <div class="results-bar">
@@ -920,7 +995,7 @@ td:first-child {
   <button id="endedToggleBtn" class="ended-toggle" type="button">Show ended</button>
   <button id="showFavouritesBtn" class="ended-toggle" type="button">Show favourites</button>
 </div>
-  <div>Tip: tap a walk name below to open it on the map.</div>
+
 </div>
 <div class="content-layout">
   <div class="table-column">
@@ -946,6 +1021,13 @@ td:first-child {
 </div>
 
     <div id="map" aria-label="Map of Jane's Walk locations"></div>
+    <div class="feedback-box">
+  <h3>Send us feedback, changes, or edits</h3>
+  <p>If you notice anything that should be updated, let us know.</p>
+  <a href="mailto:support@janeswalk.net?subject=Jane's Walk 2026 feedback" class="feedback-link">
+    Email us
+  </a>
+</div>
   </aside>
 </div>
   </div>
@@ -953,9 +1035,15 @@ td:first-child {
 
 <aside id="favouritesPanel" class="favourites-panel" aria-label="Favourite walks">
   <div class="favourites-header">
-    <h2>Favourite Walks</h2>
+  <h2>Favourite Walks</h2>
+
+  <div class="favourites-header-actions">
+    <button id="shareFavouritesBtn" class="action-btn share-btn" type="button" aria-label="Share favourite walks">
+      Share
+    </button>
     <button id="closeFavouritesBtn" class="action-btn" type="button">Close</button>
   </div>
+</div>
 
   <div id="favouritesList"></div>
 </aside>
@@ -1065,6 +1153,7 @@ const tableLoading = document.getElementById('tableLoading');
   const showAllBtn = document.getElementById('showAllBtn');
   const endedToggleBtn = document.getElementById('endedToggleBtn');
   const showFavouritesBtn = document.getElementById('showFavouritesBtn');
+  const shareFavouritesBtn = document.getElementById('shareFavouritesBtn');
 const closeFavouritesBtn = document.getElementById('closeFavouritesBtn');
 const favouritesPanel = document.getElementById('favouritesPanel');
 const favouritesBackdrop = document.getElementById('favouritesBackdrop');
@@ -1439,11 +1528,40 @@ function renderFavouritesPanel() {
     </div>
   `).join('');
 }
+  function shareFavouriteWalks() {
+  const favouriteWalks = allWalks
+    .filter(walk => isFavourite(walk))
+    .sort((a, b) => {
+      const dateDiff = getSortDateValue(a.date) - getSortDateValue(b.date);
+      if (dateDiff !== 0) return dateDiff;
+      return getSortTimeValue(a.time) - getSortTimeValue(b.time);
+    });
+
+  if (!favouriteWalks.length) {
+    alert('No favourite walks selected yet.');
+    return;
+  }
+
+  const shareText = favouriteWalks.map(walk => {
+    return `${walk.walk_name} • ${formatDate(walk.date)} • ${formatTime(walk.time)} • ${walk.neighbourhood}`;
+  }).join('\n');
+
+  if (navigator.share) {
+    navigator.share({
+      title: "Jane's Walk 2026 Favourite Walks",
+      text: `Here are the Jane's Walks I’m interested in:\n\n${shareText}`
+    }).catch(err => console.log('Share cancelled', err));
+  } else {
+    navigator.clipboard.writeText(`Jane's Walk 2026 Favourite Walks\n\n${shareText}`);
+    alert('Favourite walks copied to clipboard.');
+  }
+}
 function renderTable(walks) {
   tableBody.innerHTML = '';
   mobileCards.innerHTML = '';
 
   tableLoading.style.display = 'none';
+  walkTable.style.display = 'table';
 
   if (!walks.length) {
     walkTable.style.display = 'none';
@@ -1451,8 +1569,8 @@ function renderTable(walks) {
     return;
   }
 
-  walkTable.style.display = 'table';
   emptyTable.style.display = 'none';
+
   walks.forEach(walk => {
     const row = document.createElement('tr');
     row.dataset.id = getWalkId(walk);
@@ -1462,18 +1580,18 @@ function renderTable(walks) {
         <div class="walk-row-card">
           <div class="walk-row-top">
             <div class="walk-row-main">
-<div class="walk-pill-row">
-  <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
-  <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
-  <span class="pill pill-dark">${escapeHtml(walk.neighbourhood || '—')}</span>
-  ${getStatusPillHtml(walk)}
-</div>
+              <div class="walk-pill-row">
+                <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
+                <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
+                <span class="pill pill-dark">${escapeHtml(walk.neighbourhood || '—')}</span>
+                ${getStatusPillHtml(walk)}
+              </div>
 
               <div class="walk-title-row">
                 <div class="walk-row-main">
-<div class="walk-title-main">
-  <div class="walk-title">${escapeHtml(walk.walk_name)}</div>
-</div>
+                  <div class="walk-title-main">
+                    <div class="walk-title">${escapeHtml(walk.walk_name)}</div>
+                  </div>
 
                   ${walk.walk_leader 
                     ? `<div class="walk-leader">Led by ${escapeHtml(walk.walk_leader)}</div>` 
@@ -1483,28 +1601,26 @@ function renderTable(walks) {
                     ? `<div class="tag-list">${renderThemeTags(walk.themes)}</div>` 
                     : ''}
                 </div>
-
-                
               </div>
             </div>
 
-           <div class="walk-row-actions">
-  <button 
-    class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
-    type="button" 
-    aria-label="Favourite ${escapeHtml(walk.walk_name)}"
-    onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
-    ${isFavourite(walk) ? '★' : '☆'}
-  </button>
+            <div class="walk-row-actions">
+              <button 
+                class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
+                type="button" 
+                aria-label="Favourite ${escapeHtml(walk.walk_name)}"
+                onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
+                ${isFavourite(walk) ? '★' : '☆'}
+              </button>
 
-  ${walk.walk_url 
-    ? `<button class="action-btn walk-link-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
-    : ''}
+              ${walk.walk_url 
+                ? `<button class="action-btn walk-link-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
+                : ''}
 
-  <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
-    Directions
-  </button>
-</div>
+              <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
+                Directions
+              </button>
+            </div>
           </div>
         </div>
       </td>
@@ -1521,20 +1637,20 @@ function renderTable(walks) {
     card.className = 'card';
 
     card.innerHTML = `
-<div class="walk-pill-row">
-  <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
-  <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
-  <span class="pill pill-dark">${escapeHtml(walk.neighbourhood || '—')}</span>
-  ${getStatusPillHtml(walk)}
-</div>
+      <div class="walk-pill-row">
+        <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
+        <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
+        <span class="pill pill-dark">${escapeHtml(walk.neighbourhood || '—')}</span>
+        ${getStatusPillHtml(walk)}
+      </div>
 
       <div class="walk-title-row">
         <div class="walk-row-main">
-<div class="walk-title-main">
-  <h3 style="margin:0;">
-    <button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button>
-  </h3>
-</div>
+          <div class="walk-title-main">
+            <h3 style="margin:0;">
+              <button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button>
+            </h3>
+          </div>
 
           ${walk.walk_leader 
             ? `<div class="walk-leader">Led by ${escapeHtml(walk.walk_leader)}</div>` 
@@ -1586,7 +1702,8 @@ function applyFilters() {
     const matchesNeighbourhood = !neighbourhoodValue || walk.neighbourhood === neighbourhoodValue;
     const matchesTime = !timeValue || getTimePeriod(walk.time) === timeValue;
 
-    const matchesEndedVisibility = showEndedWalks || !isWalkEnded(walk);
+    const matchesEndedVisibility =
+  showEndedWalks || (!isWalkEnded(walk) && !isWalkCancelled(walk));
 
     return matchesSearch && matchesDate && matchesTime && matchesNeighbourhood && matchesEndedVisibility;
   })
@@ -1604,7 +1721,7 @@ function applyFilters() {
     applyFilters();
   }
 
- async function loadWalks() {
+async function loadWalks() {
   statusEl.textContent = 'Loading walks...';
 
   tableLoading.style.display = 'flex';
@@ -1621,17 +1738,13 @@ function applyFilters() {
     populateFilterOptions();
     applyFilters();
 
-    tableLoading.style.display = 'none';
-    walkTable.style.display = 'table';
-
     statusEl.textContent = '';
     statusEl.style.display = 'none';
   } catch (error) {
     console.error(error);
-
-    tableLoading.style.display = 'flex';
-    tableLoading.textContent = 'Could not load walks.';
+    tableLoading.style.display = 'none';
     walkTable.style.display = 'none';
+    emptyTable.style.display = 'block';
 
     statusEl.style.display = 'block';
     statusEl.textContent = 'Could not load walk data. Check your Apps Script URL and sharing settings.';
@@ -1696,6 +1809,7 @@ async function loadWeather() {
   applyFilters();
 });
   showFavouritesBtn.addEventListener('click', openFavouritesPanel);
+  shareFavouritesBtn.addEventListener('click', shareFavouriteWalks);
 closeFavouritesBtn.addEventListener('click', closeFavouritesPanel);
 favouritesBackdrop.addEventListener('click', closeFavouritesPanel);
 showAllBtn.addEventListener('click', () => {
