@@ -573,13 +573,7 @@ td:first-child {
     box-shadow: 0 0 0 0 rgba(34, 107, 63, 0);
   }
 }
-    .sticky-top-section {
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  background: #fff;
-  padding-bottom: 14px;
-}
+  
 
 .sticky-top-section::after {
   content: "";
@@ -1207,6 +1201,17 @@ td:first-child {
     line-height: 1.2;
   }
 }
+    .sticky-top-section {
+  background: #fff;
+}
+
+.sticky-top-section::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: #eee;
+  margin-top: 12px;
+}
     @media (max-width: 640px) {
   .sticky-top-section {
     position: sticky;
@@ -1246,6 +1251,31 @@ td:first-child {
     margin-bottom: 14px;
     overflow: hidden;
     background: #f7f7f7;
+  }
+}
+      .mobile-feedback-btn {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .mobile-search-row {
+    grid-template-columns: 1fr auto auto;
+  }
+
+  .mobile-feedback-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    min-height: 42px;
+    border-radius: 999px;
+    background: #fffaf2;
+    color: #6f675d;
+    border: 1px solid #d8cdbb;
+    font-weight: 800;
+    font-size: 18px;
+    padding: 0;
   }
 }
   </style>
@@ -1307,13 +1337,14 @@ td:first-child {
     </div>
 
 <div class="results-bar">
-<div class="result-summary">
-  <span id="resultCount">0 walks</span>
-  <button id="endedToggleBtn" class="ended-toggle" type="button">Show ended</button>
-  <button id="showFavouritesBtn" class="ended-toggle" type="button">Show favourites</button>
+  <div class="result-summary">
+    <span id="resultCount">0 walks</span>
+    <button id="endedToggleBtn" class="ended-toggle" type="button">Show ended</button>
+    <button id="showFavouritesBtn" class="ended-toggle" type="button">Show favourites</button>
+  </div>
+</div>
 </div>
 
-</div>
 <div class="content-layout">
   <div class="table-column">
   <div class="table-wrap">
@@ -1341,7 +1372,7 @@ td:first-child {
   </aside>
 </div>
   </div>
-     </div>
+    
   <div id="feedbackBackdrop" class="favourites-backdrop"></div>
 
 <aside id="feedbackPanel" class="favourites-panel" aria-label="Send feedback">
@@ -1388,9 +1419,7 @@ td:first-child {
   </div>
 </aside>
 
-<div id="favouritesBackdrop" class="favourites-backdrop"></div>
 
-<aside id="favouritesPanel" class="favourites-panel" aria-label="Favourite walks">
 <div id="favouritesBackdrop" class="favourites-backdrop"></div>
 
 <aside id="favouritesPanel" class="favourites-panel" aria-label="Favourite walks">
@@ -1930,19 +1959,6 @@ function closeFavouritesPanel() {
   favouritesBackdrop.classList.remove('open');
 }
 
-function renderFavouritesPanel() {
-  const favouriteWalks = allWalks
-    .filter(walk => isFavourite(walk))
-    .sort((a, b) => {
-      const dateDiff = getSortDateValue(a.date) - getSortDateValue(b.date);
-      if (dateDiff !== 0) return dateDiff;
-      return getSortTimeValue(a.time) - getSortTimeValue(b.time);
-    });
-renderFavouritesMiniMap(favouriteWalks);
-  if (!favouriteWalks.length) {
-    favouritesList.innerHTML = `<p style="color:#6f675d;">No favourite walks yet. Tap the star beside a walk to save it here.</p>`;
-    return;
-  }
 function renderFavouritesMiniMap(favouriteWalks) {
   const miniMapEl = document.getElementById('favouritesMiniMap');
   if (!miniMapEl) return;
@@ -1994,6 +2010,23 @@ function renderFavouritesMiniMap(favouriteWalks) {
     if (favouritesMap.getZoom() > 14) favouritesMap.setZoom(14);
   });
 }
+
+function renderFavouritesPanel() {
+  const favouriteWalks = allWalks
+    .filter(walk => isFavourite(walk))
+    .sort((a, b) => {
+      const dateDiff = getSortDateValue(a.date) - getSortDateValue(b.date);
+      if (dateDiff !== 0) return dateDiff;
+      return getSortTimeValue(a.time) - getSortTimeValue(b.time);
+    });
+
+  renderFavouritesMiniMap(favouriteWalks);
+
+  if (!favouriteWalks.length) {
+    favouritesList.innerHTML = `<p style="color:#6f675d;">No favourite walks yet. Tap the star beside a walk to save it here.</p>`;
+    return;
+  }
+
   favouritesList.innerHTML = favouriteWalks.map(walk => `
     <div class="favourite-card">
       <h3>${escapeHtml(walk.walk_name)}</h3>
@@ -2011,9 +2044,9 @@ function renderFavouritesMiniMap(favouriteWalks) {
         </button>
       </div>
 
-<button class="action-btn" style="margin-top:8px; width:100%;" onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
-  Remove from favourites
-</button>
+      <button class="action-btn" style="margin-top:8px; width:100%;" onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
+        Remove from favourites
+      </button>
     </div>
   `).join('');
 }
@@ -2372,31 +2405,7 @@ feedbackBackdrop.addEventListener('click', closeFeedbackPanel);
 feedbackForm.addEventListener('submit', handleFeedbackSubmit);
   window.initMap = initMap;
 
-  .mobile-feedback-btn {
-  display: none;
-}
 
-@media (max-width: 640px) {
-  .mobile-search-row {
-    grid-template-columns: 1fr auto auto;
-  }
-
-  .mobile-feedback-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 42px;
-    height: 42px;
-    min-height: 42px;
-    border-radius: 999px;
-    background: #fffaf2;
-    color: #6f675d;
-    border: 1px solid #d8cdbb;
-    font-weight: 800;
-    font-size: 18px;
-    padding: 0;
-  }
-}
 </script>
 
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAO0OrBnbW_lnszGr6N8rojaJ1CWuaWd8M&callback=initMap"></script>
