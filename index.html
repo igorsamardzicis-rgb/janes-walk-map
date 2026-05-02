@@ -1451,6 +1451,37 @@ td:first-child {
     display: none;
   }
 }
+    .walk-row-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.desktop-directions-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.desktop-card-weather {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6f675d;
+  line-height: 1.2;
+}
+
+.desktop-rain-line {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
   </style>
 </head>
 <body>
@@ -1736,13 +1767,15 @@ function formatTime(value) {
   };
 
   const weather = weatherByDate[date];
-
   if (!weather) return '';
 
   return `
     <div class="desktop-card-weather">
-      <span>${weather.temp}</span>
-      <span>💧 ${weather.rain}</span>
+      <div>${weather.temp}</div>
+      <div class="desktop-rain-line">
+        <span>💧</span>
+        <span>${weather.rain}</span>
+      </div>
     </div>
   `;
 }
@@ -2351,26 +2384,26 @@ ${walk.themes
             </div>
 
             <div class="walk-row-actions">
-              <button 
-                class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
-                type="button" 
-                aria-label="Favourite ${escapeHtml(walk.walk_name)}"
-                onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
-                ${isFavourite(walk) ? '★' : '☆'}
-              </button>
-
-              ${walk.walk_url 
-                ? `<button class="action-btn walk-link-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
-                : ''}
-
-             <div class="desktop-directions-wrap">
-  <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
-    Directions
+  <button 
+    class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
+    type="button" 
+    aria-label="Favourite ${escapeHtml(walk.walk_name)}"
+    onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
+    ${isFavourite(walk) ? '★' : '☆'}
   </button>
 
-  ${getDesktopWeatherHtml(walk)}
+  ${walk.walk_url 
+    ? `<button class="action-btn walk-link-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
+    : ''}
+
+  <div class="desktop-directions-wrap">
+    <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
+      Directions
+    </button>
+
+    ${getDesktopWeatherHtml(walk)}
+  </div>
 </div>
-            </div>
           </div>
         </div>
       </td>
