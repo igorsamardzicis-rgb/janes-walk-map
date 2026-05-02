@@ -1207,6 +1207,47 @@ td:first-child {
     line-height: 1.2;
   }
 }
+    @media (max-width: 640px) {
+  .sticky-top-section {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: #fff;
+    padding: 10px 0 12px;
+  }
+
+  .sticky-top-section::after {
+    margin-top: 10px;
+  }
+
+  .filters {
+    margin-bottom: 10px;
+  }
+
+  .results-bar {
+    margin: 8px 0 0;
+  }
+
+  .result-summary {
+    gap: 8px;
+  }
+}
+    .favourites-mini-map {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .favourites-mini-map {
+    display: block;
+    width: 100%;
+    height: 260px;
+    border: 1px solid #d9d9d9;
+    border-radius: 14px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    background: #f7f7f7;
+  }
+}
   </style>
 </head>
 <body>
@@ -1259,7 +1300,7 @@ td:first-child {
         </select>
       </div>
 
-<div class="actions">
+<div class="actions advanced-filter">
   <button id="resetBtn" type="button">Reset filters</button>
   <button id="showAllBtn" class="primary" type="button">Show all pins</button>
 </div>
@@ -1364,7 +1405,8 @@ td:first-child {
   </div>
 </div>
 
-  <div id="favouritesList"></div>
+  <div id="favouritesMiniMap" class="favourites-mini-map"></div>
+<div id="favouritesList"></div>
 </aside>
 <script>
   const DATA_URL = 'https://script.google.com/macros/s/AKfycbzNyRqrftCnDaxXuMk_lV5kOdyqucar5yDn_eJT7gwgsQL9ltqMjRy6exyD5L4grwru7Q/exec';
@@ -1380,6 +1422,8 @@ let showEndedWalks = false;
 let favouriteWalkIds = JSON.parse(localStorage.getItem('favouriteWalkIds') || '[]');  
   const DEFAULT_MARKER_BLUE = '#3f78a8';
 const FAVOURITE_MARKER_ORANGE = '#E8913D';
+  let favouritesMap;
+let favouritesMapMarkers = [];
 
 function getSortDateValue(value) {
   const cleanDate = formatDate(value);
@@ -1500,7 +1544,10 @@ const closeFavouritesBtn = document.getElementById('closeFavouritesBtn');
 const favouritesPanel = document.getElementById('favouritesPanel');
 const favouritesBackdrop = document.getElementById('favouritesBackdrop');
 const favouritesList = document.getElementById('favouritesList');
-
+const mobileFeedbackBtn = document.getElementById('mobileFeedbackBtn');
+const feedbackPanel = document.getElementById('feedbackPanel');
+const feedbackBackdrop = document.getElementById('feedbackBackdrop');
+const closeFeedbackBtn = document.getElementById('closeFeedbackBtn');
 const feedbackForm = document.getElementById('feedbackForm');
 const feedbackName = document.getElementById('feedbackName');
 const feedbackEmail = document.getElementById('feedbackEmail');
@@ -1538,6 +1585,15 @@ function getStatusPillHtml(walk) {
   }
 
   return '';
+}
+  function openFeedbackPanel() {
+  feedbackPanel.classList.add('open');
+  feedbackBackdrop.classList.add('open');
+}
+
+function closeFeedbackPanel() {
+  feedbackPanel.classList.remove('open');
+  feedbackBackdrop.classList.remove('open');
 }
 function normalizeWalk(raw) {
   return {
@@ -1858,6 +1914,15 @@ function openFavouritesPanel() {
   renderFavouritesPanel();
   favouritesPanel.classList.add('open');
   favouritesBackdrop.classList.add('open');
+
+  setTimeout(() => {
+    if (favouritesMap) {
+      google.maps.event.trigger(favouritesMap, 'resize');
+
+      const favouriteWalks = allWalks.filter(walk => isFavourite(walk));
+      renderFavouritesMiniMap(favouriteWalks);
+    }
+  }, 250);
 }
 
 function closeFavouritesPanel() {
@@ -1873,12 +1938,62 @@ function renderFavouritesPanel() {
       if (dateDiff !== 0) return dateDiff;
       return getSortTimeValue(a.time) - getSortTimeValue(b.time);
     });
-
+renderFavouritesMiniMap(favouriteWalks);
   if (!favouriteWalks.length) {
     favouritesList.innerHTML = `<p style="color:#6f675d;">No favourite walks yet. Tap the star beside a walk to save it here.</p>`;
     return;
   }
+function renderFavouritesMiniMap(favouriteWalks) {
+  const miniMapEl = document.getElementById('favouritesMiniMap');
+  if (!miniMapEl) return;
 
+  if (!favouriteWalks.length) {
+    miniMapEl.style.display = 'none';
+    return;
+  }
+
+  miniMapEl.style.display = 'block';
+
+  if (!favouritesMap) {
+    favouritesMap = new google.maps.Map(miniMapEl, {
+      center: { lat: 43.6532, lng: -79.3832 },
+      zoom: 11,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false
+    });
+  }
+
+  favouritesMapMarkers.forEach(marker => marker.setMap(null));
+  favouritesMapMarkers = [];
+
+  const bounds = new google.maps.LatLngBounds();
+
+  favouriteWalks.forEach(walk => {
+    const marker = new google.maps.Marker({
+      position: { lat: walk.lat, lng: walk.lng },
+      map: favouritesMap,
+      title: walk.walk_name,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: FAVOURITE_MARKER_ORANGE,
+        fillOpacity: 1,
+        strokeColor: '#ffffff',
+        strokeWeight: 2
+      }
+    });
+
+    favouritesMapMarkers.push(marker);
+    bounds.extend({ lat: walk.lat, lng: walk.lng });
+  });
+
+  favouritesMap.fitBounds(bounds);
+
+  google.maps.event.addListenerOnce(favouritesMap, 'bounds_changed', () => {
+    if (favouritesMap.getZoom() > 14) favouritesMap.setZoom(14);
+  });
+}
   favouritesList.innerHTML = favouriteWalks.map(walk => `
     <div class="favourite-card">
       <h3>${escapeHtml(walk.walk_name)}</h3>
@@ -2055,7 +2170,16 @@ function renderTable(walks) {
       </div>
     `;
 
-    card.querySelector('.walk-link').addEventListener('click', () => openWalkOnMap(getWalkId(walk)));
+    card.querySelector('.walk-link').addEventListener('click', () => {
+  document.getElementById('map').scrollIntoView({
+    behavior: 'auto',
+    block: 'start'
+  });
+
+  setTimeout(() => {
+    openWalkOnMap(getWalkId(walk));
+  }, 100);
+});
     mobileCards.appendChild(card);
   });
 }
@@ -2242,8 +2366,37 @@ showAllBtn.addEventListener('click', () => {
     ? 'Hide filters'
     : 'Filter';
 });
+  mobileFeedbackBtn.addEventListener('click', openFeedbackPanel);
+closeFeedbackBtn.addEventListener('click', closeFeedbackPanel);
+feedbackBackdrop.addEventListener('click', closeFeedbackPanel);
 feedbackForm.addEventListener('submit', handleFeedbackSubmit);
   window.initMap = initMap;
+
+  .mobile-feedback-btn {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .mobile-search-row {
+    grid-template-columns: 1fr auto auto;
+  }
+
+  .mobile-feedback-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    min-height: 42px;
+    border-radius: 999px;
+    background: #fffaf2;
+    color: #6f675d;
+    border: 1px solid #d8cdbb;
+    font-weight: 800;
+    font-size: 18px;
+    padding: 0;
+  }
+}
 </script>
 
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAO0OrBnbW_lnszGr6N8rojaJ1CWuaWd8M&callback=initMap"></script>
