@@ -931,21 +931,26 @@ td:first-child {
 </div>
 <div class="content-layout">
   <div class="table-column">
-    <div class="table-wrap">
-      <table aria-label="List of walks">
-        <tbody id="walkTableBody"></tbody>
-      </table>
-      <div id="emptyTable" class="empty" style="display:none;">No walks match your filters.</div>
-    </div>
+  <div class="table-wrap">
+  <div id="tableLoading" class="table-loading">
+    Loading walks, please wait...
+  </div>
+
+  <table id="walkTable" aria-label="List of walks" style="display:none;">
+    <tbody id="walkTableBody"></tbody>
+  </table>
+
+  <div id="emptyTable" class="empty" style="display:none;">No walks match your filters.</div>
+</div>
 
     <div id="mobileCards" class="mobile-cards"></div>
   </div>
 
   <aside class="map-column">
-    <div id="weatherBox" class="weather-box">
-      <div id="weatherStatus">Loading walks, please wait...</div>
-      <div id="weatherCards" class="weather-cards"></div>
-    </div>
+<div id="weatherBox" class="weather-box">
+  <div id="weatherStatus" style="display:none;"></div>
+  <div id="weatherCards" class="weather-cards"></div>
+</div>
 
     <div id="map" aria-label="Map of Jane's Walk locations"></div>
   </aside>
@@ -1055,6 +1060,8 @@ function formatTime(value) {
   const resultCountEl = document.getElementById('resultCount');
   const tableBody = document.getElementById('walkTableBody');
   const emptyTable = document.getElementById('emptyTable');
+  const walkTable = document.getElementById('walkTable');
+const tableLoading = document.getElementById('tableLoading');
   const mobileCards = document.getElementById('mobileCards');
 
   const searchInput = document.getElementById('searchInput');
