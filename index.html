@@ -614,6 +614,270 @@ td:first-child {
   background: #eee;
   margin-top: 12px;
 }
+    /* ===== NEW TWO-COLUMN LAYOUT ===== */
+.content-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 430px;
+  gap: 24px;
+  align-items: start;
+}
+
+.table-column {
+  min-width: 0;
+}
+
+.map-column {
+  position: sticky;
+  top: 20px;
+  align-self: start;
+}
+
+.table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: auto;
+  background: #fff;
+  max-height: calc(100vh - 220px);
+}
+
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-wrap tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ===== TABLE ROWS NOW LOOK LIKE CARDS ===== */
+.walk-row-cell {
+  padding: 0;
+  border-bottom: 1px solid #ececec;
+}
+
+.walk-row-card {
+  padding: 16px 18px;
+}
+
+.walk-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.walk-row-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.walk-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.walk-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.walk-title-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.walk-title {
+  font-weight: 700;
+  color: #2b2723;
+  font-size: 15px;
+  line-height: 1.35;
+  margin-bottom: 0;
+}
+
+.walk-leader {
+  font-size: 13px;
+  color: #6f675d;
+  margin-top: 6px;
+  margin-bottom: 10px; /* added space above tags */
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 0;
+}
+
+.theme-tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: #e9e1d1;
+  color: #6a5f53;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.title-status-pill {
+  margin: 0;
+  position: relative;
+  top: -1px;
+}
+
+/* ===== BUTTONS ON RIGHT SIDE OF EACH WALK ===== */
+.walk-row-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ===== MAKE DATE / TIME / NEIGHBOURHOOD ALL BLACK ===== */
+.pill-dark,
+.pill-soft {
+  background: #2f2a24;
+  color: #fff;
+}
+
+/* ended / in progress / cancelled */
+.pill-ended {
+  background: #e9e1d1;
+  color: #6a5f53;
+  border: 1px solid #d8cdbb;
+}
+
+.pill-red {
+  background: #f8d7da;
+  color: #842029;
+  border: 1px solid #f1aeb5;
+}
+
+.pill-progress {
+  background: #dff2e6;
+  color: #226b3f;
+  animation: pulseGreen 1.4s ease-in-out infinite;
+}
+
+@keyframes pulseGreen {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 107, 63, 0.35);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 6px rgba(34, 107, 63, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 107, 63, 0);
+  }
+}
+
+/* ===== FAVOURITE BUTTON FIXED SIZE ===== */
+.favourite-btn {
+  border: 1px solid #d8cdbb;
+  background: #fffaf2;
+  color: #b8aa95;
+  border-radius: 999px;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  flex: 0 0 42px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.favourite-btn.active {
+  background: #f4efe6;
+  color: #d85a3a;
+  border-color: #d85a3a;
+}
+
+/* ===== LIGHT BLUE ACTION BUTTONS ===== */
+.action-btn.primary {
+  background: #8fc7ea;
+  color: #1f2b36;
+  border-color: #8fc7ea;
+}
+
+.action-btn.primary:hover {
+  background: #7fbce3;
+}
+
+/* optional: make Walk Page same visual style */
+.walk-link-btn {
+  background: #8fc7ea;
+  color: #1f2b36;
+  border-color: #8fc7ea;
+}
+
+.walk-link-btn:hover {
+  background: #7fbce3;
+}
+
+/* ===== WEATHER + MAP RIGHT COLUMN ===== */
+.weather-box {
+  margin: 0 0 14px;
+}
+
+.weather-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.weather-card {
+  border: 1px solid #d9d9d9;
+  border-radius: 12px;
+  padding: 12px;
+  background: #f7f7f7;
+  text-align: center;
+}
+
+#map {
+  width: 100%;
+  height: 520px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--soft);
+  margin-bottom: 0;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 1100px) {
+  .content-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .map-column {
+    position: static;
+  }
+
+  .table-wrap {
+    max-height: none;
+  }
+
+  #map {
+    height: 420px;
+  }
+}
   </style>
 </head>
 <body>
@@ -665,30 +929,27 @@ td:first-child {
 </div>
   <div>Tip: tap a walk name below to open it on the map.</div>
 </div>
-<div id="weatherBox" class="weather-box">
-  <div id="weatherStatus">Loading walks, please wait...</div>
-  <div id="weatherCards" class="weather-cards"></div>
-</div>
-    <div id="map" aria-label="Map of Jane's Walk locations"></div>
-
+<div class="content-layout">
+  <div class="table-column">
     <div class="table-wrap">
       <table aria-label="List of walks">
-        <thead>
-          <tr>
-            <th>Walk Name</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Neighbourhood</th>
-            <th>Walk Page</th>
-            <th>Directions</th>
-          </tr>
-        </thead>
         <tbody id="walkTableBody"></tbody>
       </table>
       <div id="emptyTable" class="empty" style="display:none;">No walks match your filters.</div>
     </div>
 
     <div id="mobileCards" class="mobile-cards"></div>
+  </div>
+
+  <aside class="map-column">
+    <div id="weatherBox" class="weather-box">
+      <div id="weatherStatus">Loading walks, please wait...</div>
+      <div id="weatherCards" class="weather-cards"></div>
+    </div>
+
+    <div id="map" aria-label="Map of Jane's Walk locations"></div>
+  </aside>
+</div>
   </div>
 <div id="favouritesBackdrop" class="favourites-backdrop"></div>
 
@@ -1104,7 +1365,7 @@ const marker = new google.maps.Marker({
   icon: {
     path: google.maps.SymbolPath.CIRCLE,
     scale: 10,
-    fillColor: "#89c6ea",   // your blue
+    fillColor: "#3f78a8",   // your blue
     fillOpacity: 1,
     strokeColor: "#ffffff",
     strokeWeight: 2
@@ -1194,61 +1455,53 @@ function renderFavouritesPanel() {
     row.dataset.id = getWalkId(walk);
 
     row.innerHTML = `
-      <td>
-        <div class="walk-title-row">
-          <div>
-            <div class="walk-title-main">
-              <div class="walk-title">${escapeHtml(walk.walk_name)}</div>
-              ${getStatusPillHtml(walk)}
+      <td colspan="6" class="walk-row-cell">
+        <div class="walk-row-card">
+          <div class="walk-row-top">
+            <div class="walk-row-main">
+              <div class="walk-pill-row">
+                <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
+                <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
+                <span class="pill pill-dark">${escapeHtml(walk.neighbourhood || '—')}</span>
+              </div>
+
+              <div class="walk-title-row">
+                <div class="walk-row-main">
+                  <div class="walk-title-main">
+                    <div class="walk-title">${escapeHtml(walk.walk_name)}</div>
+                    ${getStatusPillHtml(walk)}
+                  </div>
+
+                  ${walk.walk_leader 
+                    ? `<div class="walk-leader">Led by ${escapeHtml(walk.walk_leader)}</div>` 
+                    : ''}
+
+                  ${walk.themes 
+                    ? `<div class="tag-list">${renderThemeTags(walk.themes)}</div>` 
+                    : ''}
+                </div>
+
+                <button 
+                  class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
+                  type="button" 
+                  aria-label="Favourite ${escapeHtml(walk.walk_name)}"
+                  onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
+                  ${isFavourite(walk) ? '★' : '☆'}
+                </button>
+              </div>
             </div>
 
-            ${walk.walk_leader 
-              ? `<div class="walk-leader">Led by ${escapeHtml(walk.walk_leader)}</div>` 
-              : ''}
+            <div class="walk-row-actions">
+              ${walk.walk_url 
+                ? `<button class="action-btn walk-link-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
+                : ''}
 
-            ${walk.themes 
-              ? `<div class="tag-list">${renderThemeTags(walk.themes)}</div>` 
-              : ''}
+              <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
+                Directions
+              </button>
+            </div>
           </div>
-
-          <button 
-            class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
-            type="button" 
-            aria-label="Favourite ${escapeHtml(walk.walk_name)}"
-            onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
-            ${isFavourite(walk) ? '★' : '☆'}
-          </button>
         </div>
-      </td>
-
-      <td>
-        <div class="walk-meta-stack">
-          <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
-        </div>
-      </td>
-
-      <td>
-        <div class="walk-meta-stack">
-          <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
-        </div>
-      </td>
-
-      <td>
-        <div class="walk-meta-stack">
-          <span class="pill pill-soft">${escapeHtml(walk.neighbourhood)}</span>
-        </div>
-      </td>
-
-      <td>
-        ${walk.walk_url 
-          ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
-          : '—'}
-      </td>
-
-      <td>
-        <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
-          Directions
-        </button>
       </td>
     `;
 
@@ -1263,12 +1516,28 @@ function renderFavouritesPanel() {
     card.className = 'card';
 
     card.innerHTML = `
+      <div class="walk-pill-row">
+        <span class="pill pill-dark">${escapeHtml(formatDate(walk.date))}</span>
+        <span class="pill pill-dark">${escapeHtml(formatTime(walk.time))}</span>
+        <span class="pill pill-dark">${escapeHtml(walk.neighbourhood || '—')}</span>
+      </div>
+
       <div class="walk-title-row">
-        <div class="walk-title-main">
-          <h3 style="margin:0;">
-            <button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button>
-          </h3>
-          ${getStatusPillHtml(walk)}
+        <div class="walk-row-main">
+          <div class="walk-title-main">
+            <h3 style="margin:0;">
+              <button class="walk-link" type="button">${escapeHtml(walk.walk_name)}</button>
+            </h3>
+            ${getStatusPillHtml(walk)}
+          </div>
+
+          ${walk.walk_leader 
+            ? `<div class="walk-leader">Led by ${escapeHtml(walk.walk_leader)}</div>` 
+            : ''}
+
+          ${walk.themes 
+            ? `<div class="tag-list">${renderThemeTags(walk.themes)}</div>` 
+            : ''}
         </div>
 
         <button 
@@ -1279,21 +1548,9 @@ function renderFavouritesPanel() {
         </button>
       </div>
 
-      ${walk.walk_leader 
-        ? `<p><strong>Led by:</strong> ${escapeHtml(walk.walk_leader)}</p>` 
-        : ''}
-
-      <p><strong>Date:</strong> ${escapeHtml(formatDate(walk.date) || '—')}</p>
-      <p><strong>Time:</strong> ${escapeHtml(formatTime(walk.time) || '—')}</p>
-      <p><strong>Neighbourhood:</strong> ${escapeHtml(walk.neighbourhood || '—')}</p>
-
-      ${walk.themes 
-        ? `<div class="tag-list">${renderThemeTags(walk.themes)}</div>` 
-        : ''}
-
       <div class="mobile-actions">
         ${walk.walk_url 
-          ? `<button class="action-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
+          ? `<button class="action-btn walk-link-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
           : ''}
 
         <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
