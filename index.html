@@ -878,18 +878,7 @@ td:first-child {
   align-items: end;
 }
 
-.actions-logo {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 4px;
-}
 
-.actions-logo img {
-  max-height: 108px;
-  width: auto;
-  display: block;
-}
     .feedback-box {
   margin-top: 14px;
   border: 1px solid #d9d9d9;
@@ -1000,12 +989,45 @@ td:first-child {
   color: #226b3f;
   font-weight: 700;
 }
+    .page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.page-header h1 {
+  margin: 0 0 8px;
+}
+
+.page-header .intro {
+  margin: 0;
+}
+
+.site-logo {
+  width: 170px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
   </style>
 </head>
 <body>
   <div class="page">
+<div class="page-header">
+  <div>
     <h1>Jane's Walk 2026</h1>
     <p class="intro">Browse walks on the map or use the filters below. Click a walk name in the list to zoom to its pin on the map.</p>
+  </div>
+
+  <img
+    class="site-logo"
+    src="https://drive.google.com/thumbnail?id=1yZflCYB6VACqpN9Ws5rr6XD9MV5MVMi7&sz=w500"
+    alt="Jane's Walk logo"
+  />
+</div>
 
     <div id="status" class="status" style="display:none;"></div>
 <div class="sticky-top-section">
@@ -1038,11 +1060,9 @@ td:first-child {
       </div>
 
 <div class="actions actions-with-logo">
- <div class="actions-logo">
-  <img 
-    src="https://drive.google.com/thumbnail?id=1yZflCYB6VACqpN9Ws5rr6XD9MV5MVMi7&sz=w300" 
-    alt="Jane's Walk logo" 
-  />
+ <div class="actions">
+  <button id="resetBtn" type="button">Reset filters</button>
+  <button id="showAllBtn" class="primary" type="button">Show all pins</button>
 </div>
   <button id="resetBtn" type="button">Reset filters</button>
   <button id="showAllBtn" class="primary" type="button">Show all pins</button>
