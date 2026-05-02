@@ -945,30 +945,30 @@ ${isWalkCancelled(walk)
   }
 
   function applyFilters() {
-    const searchValue = searchInput.value.trim().toLowerCase();
-    const dateValue = dateFilter.value;
-    const neighbourhoodValue = neighbourhoodFilter.value;
-    const timeValue = timeFilter.value;
+  const searchValue = searchInput.value.trim().toLowerCase();
+  const dateValue = dateFilter.value;
+  const neighbourhoodValue = neighbourhoodFilter.value;
+  const timeValue = timeFilter.value;
 
-    filteredWalks = allWalks.filter(walk => {
-const matchesSearch =
-  !searchValue ||
-  walk.walk_name.toLowerCase().includes(searchValue) ||
-  const matchesSearch =
-  !searchValue ||
-  walk.walk_name.toLowerCase().includes(searchValue) ||
-  (walk.walk_leader || '').toLowerCase().includes(searchValue) ||
-  walk.neighbourhood.toLowerCase().includes(searchValue);
-      const matchesDate = !dateValue || formatDate(walk.date) === dateValue;
-      const matchesNeighbourhood = !neighbourhoodValue || walk.neighbourhood === neighbourhoodValue;
-      const matchesTime = !timeValue || getTimePeriod(walk.time) === timeValue;
-      return matchesSearch && matchesDate && matchesTime && matchesNeighbourhood;
-    });
-sortWalks(filteredWalks);
-    updateResultCount();
-    renderMarkers(filteredWalks);
-    renderTable(filteredWalks);
-  }
+  filteredWalks = allWalks.filter(walk => {
+    const matchesSearch =
+      !searchValue ||
+      walk.walk_name.toLowerCase().includes(searchValue) ||
+      (walk.walk_leader || '').toLowerCase().includes(searchValue) ||
+      walk.neighbourhood.toLowerCase().includes(searchValue);
+
+    const matchesDate = !dateValue || formatDate(walk.date) === dateValue;
+    const matchesNeighbourhood = !neighbourhoodValue || walk.neighbourhood === neighbourhoodValue;
+    const matchesTime = !timeValue || getTimePeriod(walk.time) === timeValue;
+
+    return matchesSearch && matchesDate && matchesTime && matchesNeighbourhood;
+  });
+
+  sortWalks(filteredWalks);
+  updateResultCount();
+  renderMarkers(filteredWalks);
+  renderTable(filteredWalks);
+}
 
   function resetFilters() {
     searchInput.value = '';
