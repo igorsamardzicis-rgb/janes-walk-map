@@ -62,13 +62,25 @@ td:nth-child(6) {
 }
 
 .action-btn.primary {
-  background: #0b57d0;
+  background: var(--cta-blue);
   color: white;
-  border-color: #0b57d0;
+  border-color: var(--cta-blue);
 }
 
 .action-btn.primary:hover {
-  background: #0845a5;
+  background: #74b8e1;
+  border-color: #74b8e1;
+}
+
+button.primary {
+  background: var(--cta-blue);
+  color: white;
+  border-color: var(--cta-blue);
+}
+
+button.primary:hover {
+  background: #74b8e1;
+  border-color: #74b8e1;
 }
     
     :root {
@@ -78,6 +90,7 @@ td:nth-child(6) {
       --bg: #fff;
       --soft: #f7f7f7;
       --accent: #0b57d0;
+      --cta-blue: #89c6ea;
     }
 
     * { box-sizing: border-box; }
@@ -154,11 +167,7 @@ td:nth-child(6) {
       font-size: 14px;
     }
 
-    button.primary {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
+
 
     .results-bar {
       display: flex;
@@ -585,6 +594,21 @@ td:first-child {
     box-shadow: 0 0 0 0 rgba(34, 107, 63, 0);
   }
 }
+    .sticky-top-section {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: #fff;
+  padding-bottom: 14px;
+}
+
+.sticky-top-section::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: #eee;
+  margin-top: 12px;
+}
   </style>
 </head>
 <body>
@@ -593,7 +617,7 @@ td:first-child {
     <p class="intro">Browse walks on the map or use the filters below. Click a walk name in the list to zoom to its pin on the map.</p>
 
     <div id="status" class="status" style="display:none;"></div>
-
+<div class="sticky-top-section">
     <div class="filters" aria-label="Walk filters">
       <div class="field">
         <label for="searchInput">Search by walk name or leader</label>
@@ -1075,7 +1099,7 @@ const marker = new google.maps.Marker({
   icon: {
     path: google.maps.SymbolPath.CIRCLE,
     scale: 10,
-    fillColor: "#0b57d0",   // your blue
+    fillColor: "#89c6ea",   // your blue
     fillOpacity: 1,
     strokeColor: "#ffffff",
     strokeWeight: 2
