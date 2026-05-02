@@ -878,6 +878,17 @@ td:first-child {
     #showAllBtn {
   color: #1f2b36;
 }
+    .table-loading {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #2b2723;
+  padding: 40px 20px;
+}
   </style>
 </head>
 <body>
@@ -1446,17 +1457,20 @@ function renderFavouritesPanel() {
     </div>
   `).join('');
 }
- function renderTable(walks) {
+function renderTable(walks) {
   tableBody.innerHTML = '';
   mobileCards.innerHTML = '';
 
+  tableLoading.style.display = 'none';
+
   if (!walks.length) {
+    walkTable.style.display = 'none';
     emptyTable.style.display = 'block';
     return;
   }
 
+  walkTable.style.display = 'table';
   emptyTable.style.display = 'none';
-
   walks.forEach(walk => {
     const row = document.createElement('tr');
     row.dataset.id = getWalkId(walk);
@@ -1606,27 +1620,39 @@ function applyFilters() {
     applyFilters();
   }
 
-  async function loadWalks() {
-    statusEl.textContent = 'Loading walks...';
-    document.getElementById('weatherStatus').textContent = 'Loading walks, please wait...';
+ async function loadWalks() {
+  statusEl.textContent = 'Loading walks...';
 
-    try {
-      const response = await fetch(DATA_URL, { cache: 'no-store' });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  tableLoading.style.display = 'flex';
+  walkTable.style.display = 'none';
+  emptyTable.style.display = 'none';
 
-      const raw = await response.json();
-      allWalks = sortWalks(raw.map(normalizeWalk).filter(isValidWalk));
+  try {
+    const response = await fetch(DATA_URL, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-      populateFilterOptions();
-applyFilters();
-statusEl.textContent = '';
-statusEl.style.display = 'none';
-} catch (error) {
-  console.error(error);
-  statusEl.style.display = 'block';
-  statusEl.textContent = 'Could not load walk data. Check your Apps Script URL and sharing settings.';
-}
+    const raw = await response.json();
+    allWalks = sortWalks(raw.map(normalizeWalk).filter(isValidWalk));
+
+    populateFilterOptions();
+    applyFilters();
+
+    tableLoading.style.display = 'none';
+    walkTable.style.display = 'table';
+
+    statusEl.textContent = '';
+    statusEl.style.display = 'none';
+  } catch (error) {
+    console.error(error);
+
+    tableLoading.style.display = 'flex';
+    tableLoading.textContent = 'Could not load walks.';
+    walkTable.style.display = 'none';
+
+    statusEl.style.display = 'block';
+    statusEl.textContent = 'Could not load walk data. Check your Apps Script URL and sharing settings.';
   }
+}
 async function loadWeather() {
   const weatherStatus = document.getElementById('weatherStatus');
   const weatherCards = document.getElementById('weatherCards');
