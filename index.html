@@ -1278,6 +1278,59 @@ td:first-child {
     padding: 0;
   }
 }
+    /* MOBILE FIXES */
+@media (max-width: 640px) {
+  .content-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .map-column {
+    order: 1;
+    display: block;
+    width: 100%;
+    position: static;
+  }
+
+  #map {
+    display: block;
+    width: 100%;
+    height: 320px;
+    min-height: 320px;
+    margin: 12px 0 18px;
+  }
+
+  .table-column {
+    order: 2;
+  }
+
+  .table-wrap {
+    display: none;
+  }
+
+  .mobile-cards {
+    display: grid;
+  }
+
+  body.mobile-filters-open .advanced-filter {
+    display: block;
+  }
+
+  body.mobile-filters-open .actions.advanced-filter {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  body.mobile-filters-open .actions.advanced-filter button {
+    width: 100%;
+  }
+
+  .weather-box {
+    display: none;
+  }
+}
   </style>
 </head>
 <body>
@@ -2339,9 +2392,16 @@ async function loadWeather() {
       fullscreenControl: true
     });
 
-    infoWindow = new google.maps.InfoWindow();
-    await loadWalks();
-    await loadWeather();
+   infoWindow = new google.maps.InfoWindow();
+await loadWalks();
+await loadWeather();
+
+setTimeout(() => {
+  if (map) {
+    google.maps.event.trigger(map, 'resize');
+    renderMarkers(filteredWalks);
+  }
+}, 300);
   }
 const FEEDBACK_URL = 'https://script.google.com/macros/s/AKfycbx86vOXBeqBFW_JXp5exwlTT2tSCvzcNSTI7GVCe0mGHKj2aICV-ypvru49SOam8VgzFw/exec';
 
@@ -2392,12 +2452,18 @@ showAllBtn.addEventListener('click', () => {
   timeFilter.value = '';
   applyFilters();
 });
-  mobileFilterBtn.addEventListener('click', () => {
+mobileFilterBtn.addEventListener('click', () => {
   document.body.classList.toggle('mobile-filters-open');
 
   mobileFilterBtn.textContent = document.body.classList.contains('mobile-filters-open')
     ? 'Hide filters'
     : 'Filter';
+
+  setTimeout(() => {
+    if (map) {
+      google.maps.event.trigger(map, 'resize');
+    }
+  }, 150);
 });
   mobileFeedbackBtn.addEventListener('click', openFeedbackPanel);
 closeFeedbackBtn.addEventListener('click', closeFeedbackPanel);
