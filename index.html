@@ -1331,6 +1331,21 @@ td:first-child {
     display: none;
   }
 }
+    .walk-link {
+  color: #2b2723 !important;
+  text-decoration: underline;
+  text-decoration-color: #2b2723;
+}
+
+.walk-link:visited,
+.walk-link:hover,
+.walk-link:active {
+  color: #2b2723 !important;
+}
+    .card.favourited-card {
+  border-color: #E8913D;
+  box-shadow: 0 0 0 1px #E8913D;
+}
   </style>
 </head>
 <body>
@@ -2209,7 +2224,7 @@ function renderTable(walks) {
     tableBody.appendChild(row);
 
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = `card ${isFavourite(walk) ? 'favourited-card' : ''}`;
 
     card.innerHTML = `
       <div class="walk-pill-row">
@@ -2256,15 +2271,15 @@ function renderTable(walks) {
       </div>
     `;
 
-    card.querySelector('.walk-link').addEventListener('click', () => {
-  document.getElementById('map').scrollIntoView({
-    behavior: 'auto',
-    block: 'start'
+   card.querySelector('.walk-link').addEventListener('click', () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'auto'
   });
 
   setTimeout(() => {
     openWalkOnMap(getWalkId(walk));
-  }, 100);
+  }, 250);
 });
     mobileCards.appendChild(card);
   });
