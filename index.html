@@ -1409,7 +1409,8 @@ function toggleFavourite(walkId) {
 }
 
 function updateFavouritesButtonState() {
-  const favouriteCount = favouriteWalkIds.length;
+  const validFavouriteWalks = allWalks.filter(walk => isFavourite(walk));
+  const favouriteCount = validFavouriteWalks.length;
   const hasFavourites = favouriteCount > 0;
 
   showFavouritesBtn.classList.toggle('active', hasFavourites);
@@ -1421,6 +1422,13 @@ function updateFavouritesButtonState() {
   } else {
     showFavouritesBtn.removeAttribute('data-count');
   }
+}
+  function cleanFavouriteWalkIds() {
+  const validWalkIds = allWalks.map(walk => getWalkId(walk));
+
+  favouriteWalkIds = favouriteWalkIds.filter(id => validWalkIds.includes(id));
+
+  localStorage.setItem('favouriteWalkIds', JSON.stringify(favouriteWalkIds));
 }
   function getWalkStartDateTime(walk) {
   const cleanDate = formatDate(walk.date);
@@ -1927,10 +1935,11 @@ async function loadWalks() {
     const raw = await response.json();
     allWalks = sortWalks(raw.map(normalizeWalk).filter(isValidWalk));
 
-    populateFilterOptions();
-    applyFilters();
-    updateResetButtonState();
-    updateFavouritesButtonState();
+populateFilterOptions();
+cleanFavouriteWalkIds();
+applyFilters();
+updateResetButtonState();
+updateFavouritesButtonState();
 
     statusEl.textContent = '';
     statusEl.style.display = 'none';
