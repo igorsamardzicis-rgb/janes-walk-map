@@ -1182,12 +1182,14 @@ td:first-child {
     margin-top: 0;
   }
 }
-    @media (max-width: 640px) {
-  .weather-box {
-    display: none;
-  }
+.weather-box {
+  display: none;
 }
-    @media (max-width: 640px) {
+   .mobile-card-weather {
+  display: none;
+}
+
+@media (max-width: 640px) {
   .mobile-card-weather {
     position: absolute;
     top: 66px;
@@ -1199,6 +1201,23 @@ td:first-child {
     font-weight: 700;
     color: #6f675d;
     line-height: 1.2;
+  }
+}
+
+.desktop-card-weather {
+  display: grid;
+  gap: 2px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6f675d;
+  line-height: 1.2;
+  margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  .desktop-card-weather {
+    display: none;
   }
 }
     .sticky-top-section {
@@ -1426,6 +1445,11 @@ td:first-child {
 
 .favourite-actions .action-btn {
   flex: 1;
+}
+    @media (max-width: 640px) {
+  .favourite-theme-list {
+    display: none;
+  }
 }
   </style>
 </head>
@@ -1697,6 +1721,26 @@ function formatTime(value) {
 
   return `
     <div class="mobile-card-weather">
+      <span>${weather.temp}</span>
+      <span>💧 ${weather.rain}</span>
+    </div>
+  `;
+}
+  function getDesktopWeatherHtml(walk) {
+  const date = formatDate(walk.date);
+
+  const weatherByDate = {
+    'May 1': { temp: '8°', rain: '15%' },
+    'May 2': { temp: '9°', rain: '60%' },
+    'May 3': { temp: '12°', rain: '60%' }
+  };
+
+  const weather = weatherByDate[date];
+
+  if (!weather) return '';
+
+  return `
+    <div class="desktop-card-weather">
       <span>${weather.temp}</span>
       <span>💧 ${weather.rain}</span>
     </div>
@@ -2299,9 +2343,9 @@ function renderTable(walks) {
                     ? `<div class="walk-leader">Led by ${escapeHtml(walk.walk_leader)}</div>` 
                     : ''}
 
-                  ${walk.themes 
-                    ? `<div class="tag-list">${renderThemeTags(walk.themes)}</div>` 
-                    : ''}
+${walk.themes 
+  ? `<div class="tag-list favourite-theme-list">${renderThemeTags(walk.themes)}</div>` 
+  : ''}
                 </div>
               </div>
             </div>
@@ -2319,9 +2363,13 @@ function renderTable(walks) {
                 ? `<button class="action-btn walk-link-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
                 : ''}
 
-              <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
-                Directions
-              </button>
+             <div class="desktop-directions-wrap">
+  <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
+    Directions
+  </button>
+
+  ${getDesktopWeatherHtml(walk)}
+</div>
             </div>
           </div>
         </div>
