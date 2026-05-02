@@ -1346,6 +1346,31 @@ td:first-child {
   border-color: #E8913D;
   box-shadow: 0 0 0 1px #E8913D;
 }
+    .mobile-map-loading {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .mobile-map-loading {
+    display: block;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 800;
+    color: #2b2723;
+    padding: 14px 10px;
+    margin: 8px 0 10px;
+  }
+}
+    @media (max-width: 640px) {
+  .sticky-top-section {
+    margin-left: -14px;
+    margin-right: -14px;
+    padding-left: 14px;
+    padding-right: 14px;
+    background: #fff;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.08);
+  }
+}
   </style>
 </head>
 <body>
@@ -1435,6 +1460,10 @@ td:first-child {
   <div id="weatherStatus" style="display:none;"></div>
   <div id="weatherCards" class="weather-cards"></div>
 </div>
+<div id="mobileMapLoading" class="mobile-map-loading">
+  Loading Walks, Please Wait
+</div>
+
 <div id="map" aria-label="Map of Jane's Walk locations"></div>
 
   </aside>
@@ -1626,6 +1655,7 @@ function formatTime(value) {
   const walkTable = document.getElementById('walkTable');
 const tableLoading = document.getElementById('tableLoading');
   const mobileCards = document.getElementById('mobileCards');
+  const mobileMapLoading = document.getElementById('mobileMapLoading');
 
   const searchInput = document.getElementById('searchInput');
   const dateFilter = document.getElementById('dateFilter');
@@ -2337,7 +2367,9 @@ async function loadWalks() {
   tableLoading.style.display = 'flex';
   walkTable.style.display = 'none';
   emptyTable.style.display = 'none';
-
+  if (mobileMapLoading) {
+    mobileMapLoading.style.display = 'block';
+  }
   try {
     const response = await fetch(DATA_URL, { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -2353,11 +2385,17 @@ updateFavouritesButtonState();
 
     statusEl.textContent = '';
     statusEl.style.display = 'none';
+    if (mobileMapLoading) {
+  mobileMapLoading.style.display = 'none';
+}
   } catch (error) {
     console.error(error);
     tableLoading.style.display = 'none';
     walkTable.style.display = 'none';
     emptyTable.style.display = 'block';
+        if (mobileMapLoading) {
+      mobileMapLoading.style.display = 'none';
+    }
 
     statusEl.style.display = 'block';
     statusEl.textContent = 'Could not load walk data. Check your Apps Script URL and sharing settings.';
