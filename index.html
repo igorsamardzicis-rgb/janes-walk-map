@@ -1220,6 +1220,8 @@ let markers = [];
 let activeRowId = null;
 let showEndedWalks = false;  
 let favouriteWalkIds = JSON.parse(localStorage.getItem('favouriteWalkIds') || '[]');  
+  const DEFAULT_MARKER_BLUE = '#3f78a8';
+const FAVOURITE_MARKER_ORANGE = '#d85a3a';
 
 function getSortDateValue(value) {
   const cleanDate = formatDate(value);
@@ -1637,17 +1639,20 @@ const linkHtml = walk.walk_url
     clearMarkers();
 
     walks.forEach(walk => {
+const favourite = isFavourite(walk);
+
 const marker = new google.maps.Marker({
   position: { lat: walk.lat, lng: walk.lng },
   map: map,
   title: walk.walk_name,
+  zIndex: favourite ? 9999 : 1,
   icon: {
     path: google.maps.SymbolPath.CIRCLE,
-    scale: 10,
-    fillColor: "#3f78a8",   // your blue
+    scale: favourite ? 12 : 10,
+    fillColor: favourite ? FAVOURITE_MARKER_ORANGE : DEFAULT_MARKER_BLUE,
     fillOpacity: 1,
     strokeColor: "#ffffff",
-    strokeWeight: 2
+    strokeWeight: favourite ? 3 : 2
   }
 });
 
