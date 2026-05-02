@@ -1366,19 +1366,22 @@ td:first-child {
   border-color: #E8913D;
   box-shadow: 0 0 0 1px #E8913D;
 }
-    .mobile-map-loading {
-  display: none;
+.mobile-map-loading {
+  display: none !important;
 }
 
 @media (max-width: 640px) {
   .mobile-map-loading {
-    display: block;
     text-align: center;
     font-size: 20px;
     font-weight: 800;
     color: #2b2723;
     padding: 14px 10px;
     margin: 8px 0 10px;
+  }
+
+  .mobile-map-loading.show {
+    display: block !important;
   }
 }
     @media (max-width: 640px) {
@@ -2531,9 +2534,9 @@ async function loadWalks() {
   tableLoading.style.display = 'flex';
   walkTable.style.display = 'none';
   emptyTable.style.display = 'none';
-  if (mobileMapLoading) {
-    mobileMapLoading.style.display = 'block';
-  }
+if (mobileMapLoading) {
+  mobileMapLoading.classList.add('show');
+}
   try {
     const response = await fetch(DATA_URL, { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -2549,17 +2552,17 @@ updateFavouritesButtonState();
 
     statusEl.textContent = '';
     statusEl.style.display = 'none';
-    if (mobileMapLoading) {
-  mobileMapLoading.style.display = 'none';
+if (mobileMapLoading) {
+  mobileMapLoading.classList.remove('show');
 }
   } catch (error) {
     console.error(error);
     tableLoading.style.display = 'none';
     walkTable.style.display = 'none';
     emptyTable.style.display = 'block';
-        if (mobileMapLoading) {
-      mobileMapLoading.style.display = 'none';
-    }
+if (mobileMapLoading) {
+  mobileMapLoading.classList.remove('show');
+}
 
     statusEl.style.display = 'block';
     statusEl.textContent = 'Could not load walk data. Check your Apps Script URL and sharing settings.';
