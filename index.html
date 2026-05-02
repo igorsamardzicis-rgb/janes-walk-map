@@ -943,6 +943,18 @@ td:first-child {
   text-align: center;
   padding: 24px;
 }
+
+    #resetBtn {
+  background: #f3f3f3;
+  color: #9a9a9a;
+  border-color: #dddddd;
+}
+
+#resetBtn.active {
+  background: #ffffff;
+  color: #222;
+  border-color: #d9d9d9;
+}
   </style>
 </head>
 <body>
@@ -1711,6 +1723,7 @@ function applyFilters() {
   updateResultCount();
   renderMarkers(filteredWalks);
   renderTable(filteredWalks);
+  updateResetButtonState();
 }
 
   function resetFilters() {
@@ -1720,6 +1733,15 @@ function applyFilters() {
     timeFilter.value = '';
     applyFilters();
   }
+  function updateResetButtonState() {
+  const hasActiveFilters =
+    searchInput.value.trim() !== '' ||
+    dateFilter.value !== '' ||
+    timeFilter.value !== '' ||
+    neighbourhoodFilter.value !== '';
+
+  resetBtn.classList.toggle('active', hasActiveFilters);
+}
 
 async function loadWalks() {
   statusEl.textContent = 'Loading walks...';
@@ -1737,6 +1759,7 @@ async function loadWalks() {
 
     populateFilterOptions();
     applyFilters();
+    updateResetButtonState();
 
     statusEl.textContent = '';
     statusEl.style.display = 'none';
