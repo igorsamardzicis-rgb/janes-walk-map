@@ -1007,6 +1007,36 @@ td:first-child {
   object-fit: contain;
   flex: 0 0 auto;
 }
+    #showFavouritesBtn {
+  background: #8fc7ea;
+  color: #1f2b36;
+  border-color: #8fc7ea;
+}
+
+#showFavouritesBtn:hover {
+  background: #7fbce3;
+  border-color: #7fbce3;
+}
+    #showAllBtn {
+  background: #f3f3f3;
+  color: #222;
+  border-color: #d9d9d9;
+}
+
+#showAllBtn:hover {
+  background: #e9e9e9;
+  border-color: #d0d0d0;
+}
+    .feedback-send-btn {
+  background: #f3f3f3;
+  color: #222;
+  border-color: #d9d9d9;
+}
+
+.feedback-send-btn:hover {
+  background: #e9e9e9;
+  border-color: #d0d0d0;
+}
   </style>
 </head>
 <body>
@@ -1120,7 +1150,7 @@ td:first-child {
       required
     ></textarea>
 
-    <button type="submit" class="action-btn primary">Send</button>
+    <button type="submit" class="action-btn feedback-send-btn">Send</button>
   </form>
 
   <div id="feedbackSuccess" class="feedback-success" style="display:none;">
