@@ -714,11 +714,11 @@ let showEndedWalks = false;
 let favouriteWalkIds = JSON.parse(localStorage.getItem('favouriteWalkIds') || '[]');  
 
 function getSortDateValue(value) {
-  const text = String(value || '');
+  const cleanDate = formatDate(value);
 
-  if (text.includes('May 1')) return 1;
-  if (text.includes('May 2')) return 2;
-  if (text.includes('May 3')) return 3;
+  if (cleanDate === 'May 1') return 1;
+  if (cleanDate === 'May 2') return 2;
+  if (cleanDate === 'May 3') return 3;
 
   return 99;
 }
@@ -746,7 +746,7 @@ function getSortTimeValue(value) {
 }
 
 function sortWalks(walks) {
-  return walks.sort((a, b) => {
+  return [...walks].sort((a, b) => {
     const dateDiff = getSortDateValue(a.date) - getSortDateValue(b.date);
     if (dateDiff !== 0) return dateDiff;
 
@@ -1312,7 +1312,8 @@ function applyFilters() {
   const neighbourhoodValue = neighbourhoodFilter.value;
   const timeValue = timeFilter.value;
 
-  filteredWalks = allWalks.filter(walk => {
+ filteredWalks = sortWalks(
+  allWalks.filter(walk => {
     const matchesSearch =
       !searchValue ||
       walk.walk_name.toLowerCase().includes(searchValue) ||
@@ -1326,9 +1327,8 @@ function applyFilters() {
     const matchesEndedVisibility = showEndedWalks || !isWalkEnded(walk);
 
     return matchesSearch && matchesDate && matchesTime && matchesNeighbourhood && matchesEndedVisibility;
-  });
-
-  sortWalks(filteredWalks);
+  })
+);
   updateResultCount();
   renderMarkers(filteredWalks);
   renderTable(filteredWalks);
