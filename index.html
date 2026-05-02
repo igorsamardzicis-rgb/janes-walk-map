@@ -461,20 +461,25 @@ td:first-child {
   color: #6a5f53;
   border: 1px solid #d8cdbb;
 }
-    .favourite-btn {
+.favourite-btn {
   border: 1px solid #d8cdbb;
   background: #fffaf2;
   color: #b8aa95;
   border-radius: 999px;
-  width: 38px;
-  height: 38px;
-  min-height: 38px;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  flex: 0 0 42px;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
   padding: 0;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  align-self: flex-start;
 }
 
 .favourite-btn.active {
