@@ -1450,8 +1450,8 @@ td:first-child {
 .favourite-actions .action-btn {
   flex: 1;
 }
-    @media (max-width: 640px) {
-  .favourite-theme-list {
+@media (max-width: 640px) {
+  #favouritesPanel .favourite-theme-list {
     display: none;
   }
 }
@@ -2443,9 +2443,9 @@ ${walk.themes
             ? `<div class="walk-leader">Led by ${escapeHtml(walk.walk_leader)}</div>` 
             : ''}
 
-          ${walk.themes 
-            ? `<div class="tag-list">${renderThemeTags(walk.themes)}</div>` 
-            : ''}
+${walk.themes 
+  ? `<div class="tag-list favourite-theme-list">${renderThemeTags(walk.themes)}</div>` 
+  : ''}
         </div>
 
         <button 
