@@ -461,29 +461,6 @@ td:first-child {
   color: #6a5f53;
   border: 1px solid #d8cdbb;
 }
-.favourite-btn {
-  border: 1px solid #8fc7ea;
-  background: #fff;
-  color: #8fc7ea;
-  border-radius: 999px;
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  min-height: 42px;
-  flex: 0 0 42px;
-  padding: 0;
-  font-size: 22px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.favourite-btn.active {
-  border-color: #8fc7ea;
-  background: #eaf5fc;
-  color: #8fc7ea;
-}
 
 .walk-title-row {
   display: flex;
@@ -733,10 +710,10 @@ td:first-child {
 /* ===== BUTTONS ON RIGHT SIDE OF EACH WALK ===== */
 .walk-row-actions {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 0;
 }
 
 /* ===== MAKE DATE / TIME / NEIGHBOURHOOD ALL BLACK ===== */
@@ -780,30 +757,7 @@ td:first-child {
   }
 }
 
-/* ===== FAVOURITE BUTTON FIXED SIZE ===== */
-.favourite-btn {
-  border: 1px solid #d8cdbb;
-  background: #fffaf2;
-  color: #b8aa95;
-  border-radius: 999px;
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  min-height: 42px;
-  flex: 0 0 42px;
-  padding: 0;
-  font-size: 22px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
 
-.favourite-btn.active {
-  background: #f4efe6;
-  color: #d85a3a;
-  border-color: #d85a3a;
-}
 
 /* ===== LIGHT BLUE ACTION BUTTONS ===== */
 .action-btn.primary {
@@ -888,6 +842,34 @@ td:first-child {
   font-weight: 700;
   color: #2b2723;
   padding: 40px 20px;
+}
+    .favourite-btn {
+  border: 1.5px solid #8fc7ea !important;
+  background: #fff !important;
+  color: #8fc7ea !important;
+  border-radius: 999px;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  flex: 0 0 42px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+}
+
+.favourite-btn.active {
+  border-color: #8fc7ea !important;
+  background: #8fc7ea !important;
+  color: #1f2b36 !important;
+}
+    .walk-row-actions .action-btn,
+.walk-row-actions .favourite-btn {
+  min-height: 42px;
 }
   </style>
 </head>
@@ -1502,25 +1484,27 @@ function renderTable(walks) {
                     : ''}
                 </div>
 
-                <button 
-                  class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
-                  type="button" 
-                  aria-label="Favourite ${escapeHtml(walk.walk_name)}"
-                  onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
-                  ${isFavourite(walk) ? '★' : '☆'}
-                </button>
+                
               </div>
             </div>
 
-            <div class="walk-row-actions">
-              ${walk.walk_url 
-                ? `<button class="action-btn walk-link-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
-                : ''}
+           <div class="walk-row-actions">
+  <button 
+    class="favourite-btn ${isFavourite(walk) ? 'active' : ''}" 
+    type="button" 
+    aria-label="Favourite ${escapeHtml(walk.walk_name)}"
+    onclick="toggleFavourite('${escapeHtml(getWalkId(walk))}')">
+    ${isFavourite(walk) ? '★' : '☆'}
+  </button>
 
-              <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
-                Directions
-              </button>
-            </div>
+  ${walk.walk_url 
+    ? `<button class="action-btn walk-link-btn" onclick="window.open('${escapeHtml(walk.walk_url)}', '_blank')">Walk Page</button>` 
+    : ''}
+
+  <button class="action-btn primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${walk.lat},${walk.lng}', '_blank')">
+    Directions
+  </button>
+</div>
           </div>
         </div>
       </td>
